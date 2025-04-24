@@ -1,0 +1,17 @@
+{
+	"name": "prc-datasets-inspector-sidebar-panel",
+	"version": "1.0.0",
+	"author": "PRC",
+	"license": "GPL-2.0-or-later",
+	"description": "Inspector Sidebar Panel for the PRC Datasets plugin.",
+	"scripts": {
+		"build": "wp-scripts build /src/index.js --output-path=build",
+		"start": "wp-scripts start /src/index.js --output-path=build"
+	},
+	"devDependencies": {
+		"@wordpress/scripts": "^30.14.1"
+	},
+	"dependencies": {
+		"@wordpress/icons": "^10.21.0"
+	}
+}

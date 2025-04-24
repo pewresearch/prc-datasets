@@ -1,0 +1,22 @@
+{
+	"name": "prc-datasets",
+	"version": "1.0.0",
+	"author": "PRC",
+	"license": "GPL-2.0-or-later",
+	"description": "Provides Datasets functionality for PRC Platform, a hybrid post type that combines the features of a traditional post type with a taxonomy.",
+	"scripts": {
+		"build": "bin/build.sh",
+		"start": "bin/start.sh",
+		"test": "wp-scripts test-playwright",
+		"test:env:clean": "wp-env clean all && wp-env start",
+		"test:env:destroy": "wp-env destroy",
+		"test:env:start": "wp-env start",
+		"test:env:stop": "wp-env stop"
+	},
+	"devDependencies": {
+		"@playwright/test": "^1.51.1",
+		"@wordpress/e2e-test-utils-playwright": "^1.21.0",
+		"@wordpress/env": "^10.21.0",
+		"@wordpress/scripts": "^30.14.1"
+	}
+}
