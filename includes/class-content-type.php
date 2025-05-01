@@ -174,6 +174,7 @@ class Content_Type {
 		$this->loader->add_filter( 'prc_platform_post_report_package_materials', $this, 'get_datasets_for_report_materials', 10, 2 );
 		$this->loader->add_action( 'pre_get_posts', $this, 'include_datasets_in_search', 100, 1 );
 		$this->loader->add_filter( 'prc_platform__facetwp_indexer_query_args', $this, 'include_datasets_in_facetwp_indexer_query_args', 10, 1 );
+		$this->loader->add_filter( 'prc_sitemap_supported_post_types', $this, 'opt_into_sitemap', 10, 1 );
 	}
 
 	/**
@@ -261,6 +262,19 @@ class Content_Type {
 				},
 			)
 		);
+	}
+
+	/**
+	 * Opt into sitemap.
+	 *
+	 * @hook prc_sitemap_supported_post_types
+	 *
+	 * @param array $post_types The post types.
+	 * @return array The post types.
+	 */
+	public function opt_into_sitemap( $post_types ) {
+		$post_types[] = self::$post_object_name;
+		return $post_types;
 	}
 
 	/**
@@ -400,7 +414,7 @@ class Content_Type {
 	 */
 	public function include_datasets_in_search( $query ) {
 		// Add datasets post type to search results.
-		if ( $query->is_main_query() && $query->is_search() ) {
+		if ( $query->get( 'isPubListingQuery' ) && $query->is_search() ) {
 			$query->set( 'post_type', array_merge( $query->get( 'post_type' ), array( 'dataset' ) ) );
 		}
 	}
