@@ -1,9 +1,9 @@
 {
-	"name": "prc-datasets",
+	"name": "@prc/datasets",
 	"version": "1.0.0",
 	"author": "PRC",
 	"license": "GPL-2.0-or-later",
-	"description": "Provides Datasets functionality for PRC Platform, a hybrid post type that combines the features of a traditional post type with a taxonomy.",
+	"description": "PRC Datasets provides datasets functionality for PRC Platform, a hybrid post type that combines the features of a traditional post type with a taxonomy.",
 	"scripts": {
 		"build": "bin/build.sh",
 		"start": "bin/start.sh",
