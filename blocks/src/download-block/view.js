@@ -44,8 +44,6 @@ const { state, actions } = store('prc-platform/dataset-download', {
 				},
 			});
 
-			console.log('check ATP response: ', response);
-
 			if (true === response) {
 				actions.downloadDataset(datasetId, uid, token, NONCE, context);
 			}
