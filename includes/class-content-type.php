@@ -172,7 +172,7 @@ class Content_Type {
 		$this->loader->add_filter( 'post_type_link', $this, 'modify_dataset_permalink', 20, 2 );
 		$this->loader->add_action( 'admin_bar_menu', $this, 'modify_admin_bar_edit_link', 100 );
 		$this->loader->add_filter( 'prc_platform_post_report_package_materials', $this, 'get_datasets_for_report_materials', 10, 2 );
-		$this->loader->add_action( 'pre_get_posts', $this, 'include_datasets_in_search', 100, 1 );
+		$this->loader->add_filter( 'prc_platform_pub_listing_default_args', $this, 'include_datasets_in_search', 10, 2 );
 		$this->loader->add_filter( 'prc_platform__facetwp_indexer_query_args', $this, 'include_datasets_in_facetwp_indexer_query_args', 10, 1 );
 		$this->loader->add_filter( 'prc_sitemap_supported_post_types', $this, 'opt_into_sitemap', 10, 1 );
 	}
@@ -407,16 +407,19 @@ class Content_Type {
 	/**
 	 * Include datasets in search results.
 	 *
-	 * @hook pre_get_posts
+	 * @hook prc_platform_pub_listing_default_args
 	 *
-	 * @param WP_Query $query The query object.
-	 * @return void
+	 * @param array    $query_args The query args.
+	 * @param WP_Query $query      The query object.
+	 * @return array The modified query args.
 	 */
-	public function include_datasets_in_search( $query ) {
-		// Add datasets post type to search results.
-		if ( $query->get( 'isPubListingQuery' ) && $query->is_search() ) {
-			$query->set( 'post_type', array_merge( $query->get( 'post_type' ), array( 'dataset' ) ) );
+	public function include_datasets_in_search( $query_args, $query ) {
+		// Add datasets post type to search results if the
+		// search query if the user is searching.
+		if ( strlen( $query_args['s'] ?? '' ) > 0 ) {
+			$query_args['post_type'] = array_merge( $query_args['post_type'] ?? array(), array( 'dataset' ) );
 		}
+		return $query_args;
 	}
 
 	/**
@@ -430,7 +433,7 @@ class Content_Type {
 	 * @return array The modified query args.
 	 */
 	public function include_datasets_in_facetwp_indexer_query_args( $query_args ) {
-		$query_args['post_type'] = array_merge( $query_args['post_type'], array( 'dataset' ) );
+		$query_args['post_type'] = array_merge( $query_args['post_type'] ?? array(), array( 'dataset' ) );
 		return $query_args;
 	}
 }
