@@ -3,7 +3,7 @@
 	"version": "1.0.0",
 	"author": "PRC",
 	"license": "GPL-2.0-or-later",
-	"description": "PRC Datasets provides datasets functionality for PRC Platform, a hybrid post type that combines the features of a traditional post type with a taxonomy.",
+	"description": "Provides Datasets functionality for PRC Platform, a hybrid post type that combines the features of a traditional post type with a taxonomy along with a digital rights management system for managing access to dataset files.",
 	"scripts": {
 		"build": "bin/build.sh",
 		"start": "bin/start.sh",
