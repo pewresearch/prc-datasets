@@ -59,13 +59,6 @@ class Content_Type {
 	public static $atp_legal_key = 'is_atp';
 
 	/**
-	 * The meta key for the dataset schema.
-	 *
-	 * @var string
-	 */
-	public static $schema_key = 'dataset_schema';
-
-	/**
 	 * Settings for the dataset post type.
 	 *
 	 * @var array
@@ -106,7 +99,7 @@ class Content_Type {
 		'hierarchical'       => false,
 		'menu_position'      => 10,
 		'menu_icon'          => 'dashicons-download',
-		'supports'           => array( 'title', 'editor', 'excerpt', 'revisions', 'custom-fields' ),
+		'supports'           => array( 'title', 'editor', 'excerpt', 'revisions', 'prc-revisions', 'custom-fields' ),
 	);
 
 	/**
@@ -167,31 +160,59 @@ class Content_Type {
 	 * Initialize the class.
 	 */
 	public function init() {
+		$this->loader->add_action( 'init', $this, 'register_default_post_type_support', 5 );
 		$this->loader->add_action( 'init', $this, 'register_term_data_store' );
 		$this->loader->add_filter( 'prc_platform_rewrite_rules', $this, 'archive_rewrites' );
-		$this->loader->add_filter( 'post_type_link', $this, 'modify_dataset_permalink', 20, 2 );
+		$this->loader->add_filter( 'prc_research_teams_rewrite_config', $this, 'register_research_teams_config' );
 		$this->loader->add_action( 'admin_bar_menu', $this, 'modify_admin_bar_edit_link', 100 );
 		$this->loader->add_filter( 'prc_platform_post_report_package_materials', $this, 'get_datasets_for_report_materials', 10, 2 );
 		$this->loader->add_filter( 'prc_platform_pub_listing_default_args', $this, 'include_datasets_in_search', 10, 2 );
 		$this->loader->add_filter( 'prc_platform__facetwp_indexer_query_args', $this, 'include_datasets_in_facetwp_indexer_query_args', 10, 1 );
-		$this->loader->add_filter( 'prc_sitemap_supported_post_types', $this, 'opt_into_sitemap', 10, 1 );
+	}
+
+	/**
+	 * Register default post type support for datasets.
+	 *
+	 * @hook init
+	 */
+	public function register_default_post_type_support() {
+		add_post_type_support( 'post', 'prc-datasets' );
+		add_post_type_support( 'feature', 'prc-datasets' );
+		add_post_type_support( 'chart', 'prc-datasets' );
+		// Add sitemap support for the dataset post type itself.
+		add_post_type_support( self::$post_object_name, 'prc-sitemap' );
+	}
+
+	/**
+	 * Get the enabled post types for the datasets taxonomy.
+	 *
+	 * @return array The enabled post types.
+	 */
+	public static function get_enabled_post_types() {
+		$post_types      = get_post_types( array( 'public' => true ), 'names' );
+		$supported_types = array_values(
+			array_filter(
+				$post_types,
+				function ( $pt ) {
+					return post_type_supports( $pt, 'prc-datasets' );
+				}
+			)
+		);
+		// Maintain backward compatibility with filter.
+		$filter_types       = apply_filters( 'prc_platform__datasets_enabled_post_types', array() );
+		$enabled_post_types = array_unique( array_merge( $supported_types, $filter_types ) );
+		return array_values( $enabled_post_types );
 	}
 
 	/**
 	 * Register the dataset post type and taxonomy and establish a relationship between them.
 	 *
 	 * @hook init
-	 * @uses prc_platform__datasets_enabled_post_types
 	 */
 	public function register_term_data_store() {
 		// Register the post type and taxonomy.
 		register_post_type( self::$post_object_name, self::$post_object_args );
-		$enabled_post_types = array(
-			'post',
-			'feature',
-			'chart',
-		);
-		$enabled_post_types = apply_filters( 'prc_platform__datasets_enabled_post_types', $enabled_post_types );
+		$enabled_post_types = self::get_enabled_post_types();
 		register_taxonomy( self::$taxonomy_object_name, $enabled_post_types, self::$taxonomy_object_args );
 
 		// Establish a relationship between the post type and taxonomy.
@@ -248,33 +269,6 @@ class Content_Type {
 				},
 			)
 		);
-
-		register_post_meta(
-			self::$post_object_name,
-			self::$schema_key,
-			array(
-				'description'   => 'Dataset schema.',
-				'show_in_rest'  => true,
-				'single'        => true,
-				'type'          => 'string',
-				'auth_callback' => function () {
-					return current_user_can( 'edit_posts' );
-				},
-			)
-		);
-	}
-
-	/**
-	 * Opt into sitemap.
-	 *
-	 * @hook prc_sitemap_supported_post_types
-	 *
-	 * @param array $post_types The post types.
-	 * @return array The post types.
-	 */
-	public function opt_into_sitemap( $post_types ) {
-		$post_types[] = self::$post_object_name;
-		return $post_types;
 	}
 
 	/**
@@ -304,31 +298,27 @@ class Content_Type {
 	}
 
 	/**
-	 * Modifies the dataset permalink to point to the datasets term archive permalink.
+	 * Register dataset rewrite configuration for research team prefixed URLs.
 	 *
-	 * @hook post_link
+	 * This provides the dataset URL patterns for research-team-prefixed URLs like
+	 * /politics/dataset/american-trends-panel-wave-1/ instead of just /dataset/american-trends-panel-wave-1/.
 	 *
-	 * @param string  $url  The URL of the post.
-	 * @param WP_Post $post The post object.
-	 * @return string The modified URL.
+	 * @hook prc_research_teams_rewrite_config
+	 *
+	 * @param array $config The rewrite configuration.
+	 * @return array Modified configuration.
 	 */
-	public function modify_dataset_permalink( $url, $post ) {
-		if ( 'publish' !== $post->post_status ) {
-			return $url;
-		}
-		if ( self::$post_object_name === $post->post_type ) {
-			// Get the matching term...
-			$dataset_term = \TDS\get_related_term( $post->ID );
-			if ( ! $dataset_term ) {
-				return $url;
-			}
-			// Get the term link.
-			$matched_url = get_term_link( $dataset_term, self::$taxonomy_object_name );
-			if ( ! is_wp_error( $matched_url ) ) {
-				return $matched_url;
-			}
-		}
-		return $url;
+	public function register_research_teams_config( $config ) {
+		$config['dataset'] = array(
+			'slug_pattern'       => 'dataset/([^/]+)',
+			'query_string'       => 'datasets=$matches[2]',
+			'supports'           => array( 'iframe', 'embed', 'attachment' ),
+			'attachment_pattern' => 'dataset/[^/]+/([^/]+)',
+			'additional_rules'   => array(
+				'datasets' => 'post_type=dataset',
+			),
+		);
+		return $config;
 	}
 
 	/**

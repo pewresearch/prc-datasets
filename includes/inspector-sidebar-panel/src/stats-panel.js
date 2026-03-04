@@ -1,3 +1,7 @@
+/**
+ * WordPress Dependencies
+ */
+
 import { useMemo, useState, useEffect } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { PanelBody, BaseControl, SelectControl } from '@wordpress/components';
@@ -20,6 +24,7 @@ function useDatasetStats(postId) {
 				});
 			})
 			.catch((error) => {
+				// eslint-disable-next-line no-console
 				console.error({ error });
 			});
 	}, [postId]);

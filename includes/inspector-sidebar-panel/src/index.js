@@ -8,7 +8,10 @@ import { MediaDropZone } from '@prc/components';
  * WordPress Dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Fragment, useMemo, useState, useEffect } from 'react';
+import { useMemo } from '@wordpress/element';
+import { useCommand } from '@wordpress/commands';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { store as editPostStore } from '@wordpress/edit-post';
 import { registerPlugin } from '@wordpress/plugins';
 import {
 	PluginSidebar,
@@ -16,15 +19,8 @@ import {
 	PluginPrePublishPanel,
 	store as editorStore,
 } from '@wordpress/editor';
-import { useSelect } from '@wordpress/data';
 import { useEntityProp } from '@wordpress/core-data';
-import {
-	Button,
-	CardDivider,
-	PanelBody,
-	TextareaControl,
-	ToggleControl,
-} from '@wordpress/components';
+import { CardDivider, PanelBody, ToggleControl } from '@wordpress/components';
 
 /**
  * Internal Dependencies
@@ -35,6 +31,20 @@ const PLUGIN_NAME = 'prc-platform-datasets-panel';
 const ALLOWED_TYPES = ['application/zip', 'application/pdf'];
 
 function DatasetOptionsPanel() {
+	const { openGeneralSidebar } = useDispatch(editPostStore);
+
+	useCommand({
+		name: 'prc/show-dataset-options',
+		label: __('Show Dataset Options', 'prc-datasets'),
+		icon,
+		category: 'view',
+		keywords: ['dataset', 'options', 'download', 'atp'],
+		callback: ({ close }) => {
+			openGeneralSidebar(`${PLUGIN_NAME}/${PLUGIN_NAME}`);
+			close();
+		},
+	});
+
 	const { postType, postId } = useSelect((select) => {
 		const currentPostType = select(editorStore).getCurrentPostType();
 		const currentPostId = select(editorStore).getCurrentPostId();
@@ -46,16 +56,15 @@ function DatasetOptionsPanel() {
 
 	const [meta, setMeta] = useEntityProp('postType', postType, 'meta', postId);
 
-	const { attachmentId, isAtp, datasetSchema } = useMemo(() => {
+	const { attachmentId, isAtp } = useMemo(() => {
 		return {
 			attachmentId: meta._download_attachment_id || false,
 			isAtp: meta.is_atp || false,
-			datasetSchema: meta.dataset_schema || '',
 		};
 	}, [meta]);
 
 	return (
-		<Fragment>
+		<>
 			<PluginSidebarMoreMenuItem target={PLUGIN_NAME} icon={icon}>
 				{__('Dataset Options')}
 			</PluginSidebarMoreMenuItem>
@@ -130,7 +139,7 @@ function DatasetOptionsPanel() {
 					/>
 				</PanelBody>
 			</PluginPrePublishPanel>
-		</Fragment>
+		</>
 	);
 }
 
