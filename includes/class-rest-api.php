@@ -288,10 +288,13 @@ class Rest_API {
 				)
 			);
 		}
-		if ( ! array_key_exists( 'uid', $data ) ) {
-			return new WP_Error( 'no_uid', 'No UID provided.', array( 'status' => 400 ) );
+
+		$auth = \PRC\Platform\User_Accounts\extract_user_auth_from_request( $request );
+		if ( is_wp_error( $auth ) ) {
+			return $auth;
 		}
-		$uid = $data['uid'];
+		$uid   = $auth['uid'];
+		$token = $auth['token'];
 
 		$id = $request->get_param( 'dataset_id' );
 		if ( ! $id ) {
@@ -324,7 +327,7 @@ class Rest_API {
 			// Log the download.
 			$this->increment_download_total( $id );
 			$this->log_monthly_download_count( $id );
-			$this->log_dataset_to_user( $uid, $id );
+			$this->log_dataset_to_user( $uid, $id, $token );
 			return rest_ensure_response(
 				array(
 					'file_url' => $file_url,
@@ -345,14 +348,15 @@ class Rest_API {
 		if ( ! wp_verify_nonce( $nonce, 'prc_platform_dataset_download' ) ) {
 			return new WP_Error( 'invalid_nonce', 'Invalid nonce.', array( 'status' => 400 ) );
 		}
-		if ( ! array_key_exists( 'uid', $data ) ) {
-			return new WP_Error( 'no_uid', 'No UID provided.', array( 'status' => 400 ) );
+
+		$auth = \PRC\Platform\User_Accounts\extract_user_auth_from_request( $request );
+		if ( is_wp_error( $auth ) ) {
+			return $auth;
 		}
-		$uid = $data['uid'];
 		if ( ! class_exists( 'PRC\Platform\User_Accounts\User_Data' ) ) {
 			return new WP_Error( 'no_user_accounts', 'User Accounts class not found.', array( 'status' => 400 ) );
 		}
-		$user = new \PRC\Platform\User_Accounts\User_Data( $uid, null );
+		$user = new \PRC\Platform\User_Accounts\User_Data( $auth['uid'], $auth['token'] );
 		return rest_ensure_response( $user->check_atp() );
 	}
 
@@ -368,14 +372,15 @@ class Rest_API {
 		if ( ! wp_verify_nonce( $nonce, 'prc_platform_dataset_download' ) ) {
 			return new WP_Error( 'invalid_nonce', 'Invalid nonce.', array( 'status' => 400 ) );
 		}
-		if ( ! array_key_exists( 'uid', $data ) ) {
-			return new WP_Error( 'no_uid', 'No UID provided.', array( 'status' => 400 ) );
+
+		$auth = \PRC\Platform\User_Accounts\extract_user_auth_from_request( $request );
+		if ( is_wp_error( $auth ) ) {
+			return $auth;
 		}
-		$uid = $data['uid'];
 		if ( ! class_exists( 'PRC\Platform\User_Accounts\User_Data' ) ) {
 			return new WP_Error( 'no_user_accounts', 'User Accounts class not found.', array( 'status' => 400 ) );
 		}
-		$user = new \PRC\Platform\User_Accounts\User_Data( $uid, null );
+		$user = new \PRC\Platform\User_Accounts\User_Data( $auth['uid'], $auth['token'] );
 		return rest_ensure_response( $user->accept_atp() );
 	}
 
@@ -432,11 +437,11 @@ class Rest_API {
 		if ( wp_verify_nonce( $request->get_header( 'X-WP-Nonce' ), 'WP_REST' ) === false ) {
 			return new WP_Error( 'invalid_nonce', 'Invalid nonce.', array( 'status' => 403 ) );
 		}
-		$data = json_decode( $request->get_body(), true );
-		if ( ! array_key_exists( 'uid', $data ) ) {
-			return new WP_Error( 'no_uid', 'No UID provided.', array( 'status' => 400 ) );
+
+		$auth = \PRC\Platform\User_Accounts\extract_user_auth_from_request( $request );
+		if ( is_wp_error( $auth ) ) {
+			return $auth;
 		}
-		$uid = $data['uid'];
 
 		$id = $request->get_param( 'dataset_id' );
 		if ( ! $id ) {
@@ -444,10 +449,9 @@ class Rest_API {
 		}
 
 		$return = array();
-		// We run through these without checking the prior return because we want to log as much as possible in the event of a failure. This way the total is incremented first, the truest number, then the monthyl count, then lastly the users personal log.
 		$return['total']   = $this->increment_download_total( $id );
 		$return['monthly'] = $this->log_monthly_download_count( $id );
-		$return['uid']     = $this->log_dataset_to_user( $uid, $id );
+		$return['uid']     = $this->log_dataset_to_user( $auth['uid'], $id, $auth['token'] );
 
 		return $return;
 	}
@@ -544,12 +548,13 @@ class Rest_API {
 	/**
 	 * Log a dataset to a user.
 	 *
-	 * @param mixed $uid The user ID.
-	 * @param mixed $dataset_id The dataset ID.
+	 * @param mixed       $uid        The user ID.
+	 * @param mixed       $dataset_id The dataset ID.
+	 * @param string|null $token      Firebase ID token for identity verification.
 	 * @return true|WP_Error
 	 */
-	public function log_dataset_to_user( $uid, $dataset_id ) {
-		$user = new \PRC\Platform\User_Accounts\User_Data( $uid, null );
+	public function log_dataset_to_user( $uid, $dataset_id, $token = null ) {
+		$user = new \PRC\Platform\User_Accounts\User_Data( $uid, $token );
 
 		$existing_data = $user->get_data();
 		if ( is_wp_error( $existing_data ) ) {

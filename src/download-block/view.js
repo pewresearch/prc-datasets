@@ -6,16 +6,22 @@ import { store, getContext, getElement } from '@wordpress/interactivity';
 
 const { state, actions } = store('prc-platform/dataset-download', {
 	actions: {
-		downloadDataset: (datasetId, uid, token, NONCE, context) => {
+		downloadDataset: (datasetId, NONCE, context) => {
+			const { getUserHeaders } = store(
+				'prc-user-accounts/content-gate'
+			).actions;
+			const headers = getUserHeaders();
+			if (!headers) {
+				context.isProcessing = false;
+				context.isError = true;
+				return;
+			}
 			window?.wp
 				?.apiFetch({
 					path: `/prc-api/v3/datasets/get-download/?dataset_id=${datasetId}`,
 					method: 'POST',
-					data: {
-						uid,
-						userToken: token,
-						NONCE,
-					},
+					headers,
+					data: { NONCE },
 				})
 				.then((response) => {
 					if (response?.file_url) {
@@ -30,30 +36,43 @@ const { state, actions } = store('prc-platform/dataset-download', {
 					console.error(error);
 				});
 		},
-		async checkATP(uid, token, datasetId, NONCE) {
+		async checkATP(datasetId, NONCE) {
 			const { ref } = getElement();
 			const context = getContext();
-
-			const response = await window?.wp?.apiFetch({
-				path: `/prc-api/v3/datasets/check-atp/`,
-				method: 'POST',
-				data: {
-					uid,
-					userToken: token,
-					NONCE,
-				},
-			});
-
-			if (true === response) {
-				actions.downloadDataset(datasetId, uid, token, NONCE, context);
+			const { getUserHeaders } = store(
+				'prc-user-accounts/content-gate'
+			).actions;
+			const headers = getUserHeaders();
+			if (!headers) {
+				context.isProcessing = false;
+				context.isError = true;
+				return;
 			}
-			if (false === response) {
-				const dialogId =
-					ref.parentElement.parentElement.parentElement.getAttribute(
-						'id'
-					);
-				const { open } = store('prc-block/dialog')?.actions;
-				open(dialogId);
+
+			try {
+				const response = await window?.wp?.apiFetch({
+					path: `/prc-api/v3/datasets/check-atp/`,
+					method: 'POST',
+					headers,
+					data: { NONCE },
+				});
+
+				if (true === response) {
+					actions.downloadDataset(datasetId, NONCE, context);
+				}
+				if (false === response) {
+					context.isProcessing = false;
+					const dialogId =
+						ref.parentElement.parentElement.parentElement.getAttribute(
+							'id'
+						);
+					const { open } = store('prc-block/dialog')?.actions;
+					open(dialogId);
+				}
+			} catch (error) {
+				context.isProcessing = false;
+				context.isError = true;
+				console.error(error);
 			}
 		},
 		onButtonClick: (event) => {
@@ -63,14 +82,10 @@ const { state, actions } = store('prc-platform/dataset-download', {
 
 			context.isProcessing = true;
 
-			const { token, uid } = store(
-				'prc-user-accounts/content-gate'
-			)?.state;
-
 			if (isATP) {
-				actions.checkATP(uid, token, datasetId, NONCE);
+				actions.checkATP(datasetId, NONCE);
 			} else {
-				actions.downloadDataset(datasetId, uid, token, NONCE, context);
+				actions.downloadDataset(datasetId, NONCE, context);
 			}
 		},
 	},

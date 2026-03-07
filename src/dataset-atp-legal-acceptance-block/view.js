@@ -49,30 +49,24 @@ const { actions } = store('prc-platform/dataset-download', {
 			const context = getContext();
 			const { datasetId, NONCE } = context;
 
-			const contentGateStore = store('prc-user-accounts/content-gate');
-			const contentGateState = contentGateStore.state;
-
-			const { token, uid } = contentGateState;
+			const { getUserHeaders } = store(
+				'prc-user-accounts/content-gate'
+			).actions;
+			const headers = getUserHeaders();
+			if (!headers) {
+				return;
+			}
 			yield apiFetch({
 				path: `/prc-api/v3/datasets/accept-atp`,
 				method: 'POST',
-				data: {
-					uid,
-					userToken: token,
-					NONCE,
-				},
+				headers,
+				data: { NONCE },
 			})
-				.then((response) => {
-					actions.downloadDataset(
-						datasetId,
-						uid,
-						token,
-						NONCE,
-						context
-					);
+				.then(() => {
+					actions.downloadDataset(datasetId, NONCE, context);
 					actions.closeDialogs();
 				})
-				.catch((error) => {
+				.catch(() => {
 					actions.closeDialogs();
 				});
 		},
