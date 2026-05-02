@@ -1,10 +1,10 @@
 # PRC Datasets
 
-Manages the `dataset` post type and `datasets` taxonomy as a linked pair (via TDS), providing a digital-rights-management layer for file downloads, an ATP legal-acceptance gate, download telemetry, and Firebase sync for Cloud Function–computed user statistics.
+Manages the `dataset` post type and `datasets` taxonomy as a linked pair (via [`prc/term-data-store`](https://github.com/pewresearch/term-data-store), namespace `PRC\TDS`), providing a digital-rights-management layer for file downloads, an ATP legal-acceptance gate, download telemetry, and Firebase sync for Cloud Function–computed user statistics.
 
 ## What it does
 
-- Registers the `dataset` CPT and `datasets` taxonomy and binds them via TDS so each taxonomy term has a corresponding post that holds the content and metadata.
+- Registers the `dataset` CPT and `datasets` taxonomy and binds them via `prc/term-data-store` so each taxonomy term has a corresponding post that holds the content and metadata.
 - Adds `prc-datasets` post type support to `post`, `feature`, and `chart` so those post types can be tagged with dataset terms.
 - Gated downloads — resolves the download file URL (media library attachment, legacy meta, or legacy archive fallback) only after verifying a nonce and a Firebase UID.
 - ATP (American Trends Panel) legal gate — marks individual datasets as ATP-restricted; users must accept the ATP Terms of Service before a download URL is returned.
@@ -21,7 +21,7 @@ Manages the `dataset` post type and `datasets` taxonomy as a linked pair (via TD
 
 | File | Purpose |
 |---|---|
-| `includes/class-content-type.php` | CPT/taxonomy registration, TDS relationship, meta field registration, rewrite rules, research team URL config, search/FacetWP inclusion |
+| `includes/class-content-type.php` | CPT/taxonomy registration, `prc/term-data-store` relationship, meta field registration, rewrite rules, research team URL config, search/FacetWP inclusion |
 | `includes/class-rest-api.php` | REST endpoint registration and all download/ATP/logging handlers |
 | `includes/class-firebase-sync.php` | Syncs ATP dataset IDs to Firebase on content lifecycle events |
 | `includes/class-cli.php` | WP-CLI commands under `wp prc datasets` |
@@ -42,7 +42,7 @@ Manages the `dataset` post type and `datasets` taxonomy as a linked pair (via TD
 
 ## REST API endpoints
 
-All endpoints are registered under `prc-api/v3` via the `prc_api_endpoints` filter.
+All endpoints are registered under `prc-api/v3` on `rest_api_init`.
 
 | Method | Route | Auth | Description |
 |---|---|---|---|
@@ -72,12 +72,12 @@ The `dataset` post type also gets a `_downloads` REST field that exposes the sam
 
 | Hook | Type | Source | Description |
 |---|---|---|---|
-| `prc_platform_rewrite_rules` | Filter | prc-platform-core | Adds dataset archive rewrite rules (`/datasets/`, `/datasets/{year}/`) |
+| `init` | Action | native WP | Registers dataset archive rewrite rules (`/datasets/`, `/datasets/{year}/`) via `add_rewrite_rule` |
 | `prc_research_teams_rewrite_config` | Filter | prc-research-teams | Registers research-team-prefixed URL patterns for `dataset` |
 | `prc_platform_post_report_package_materials` | Filter | prc-platform-core | Appends dataset terms to the report package materials array |
 | `prc_platform_pub_listing_default_args` | Filter | prc-pub-listing | Adds `dataset` to `post_type` when a search string is present |
 | `prc_platform__facetwp_indexer_query_args` | Filter | prc-facets | Adds `dataset` to the FacetWP indexer query so datasets are facetable |
-| `prc_api_endpoints` | Filter | prc-platform-core | Registers the five dataset REST endpoints |
+| `rest_api_init` | Action | WordPress core | Registers the five dataset REST endpoints directly |
 | `prc_platform_on_publish` | Action | prc-platform-core | Triggers Firebase ATP ID sync on publish |
 | `prc_platform_on_update` | Action | prc-platform-core | Triggers Firebase ATP ID sync on update |
 | `prc_platform_on_trash` | Action | prc-platform-core | Triggers Firebase ATP ID sync on trash |
@@ -116,10 +116,10 @@ wp prc datasets missing-files [--dry-run]
 
 | Dependency | Notes |
 |---|---|
-| `prc-platform-core` | Provides `PRC\Platform\Firebase`, lifecycle action hooks, and `prc_api_endpoints` |
+| `prc-platform-core` | Provides `PRC\Platform\Firebase` and lifecycle action hooks |
 | `prc-user-accounts` | `PRC\Platform\User_Accounts\User_Data` — ATP acceptance checks and per-user download logging |
 | `@prc/components` | `MediaDropZone` used in the editor sidebar panel |
-| TDS (Term Data Store) | `\TDS\add_relationship()` links the `dataset` CPT and `datasets` taxonomy |
+| [`prc/term-data-store`](https://github.com/pewresearch/term-data-store) (`PRC\TDS`) | `\PRC\TDS\add_relationship()` links the `dataset` CPT and `datasets` taxonomy |
 | Action Scheduler | Async `prc_dataset_recovery` jobs for legacy file migration |
 | FacetWP | Indexer integration (optional; gracefully skipped if not active) |
 

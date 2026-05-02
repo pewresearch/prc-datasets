@@ -162,7 +162,7 @@ class Content_Type {
 	public function init() {
 		$this->loader->add_action( 'init', $this, 'register_default_post_type_support', 5 );
 		$this->loader->add_action( 'init', $this, 'register_term_data_store' );
-		$this->loader->add_filter( 'prc_platform_rewrite_rules', $this, 'archive_rewrites' );
+		$this->loader->add_action( 'init', $this, 'archive_rewrites' );
 		$this->loader->add_filter( 'prc_research_teams_rewrite_config', $this, 'register_research_teams_config' );
 		$this->loader->add_action( 'admin_bar_menu', $this, 'modify_admin_bar_edit_link', 100 );
 		$this->loader->add_filter( 'prc_platform_post_report_package_materials', $this, 'get_datasets_for_report_materials', 10, 2 );
@@ -216,7 +216,7 @@ class Content_Type {
 		register_taxonomy( self::$taxonomy_object_name, $enabled_post_types, self::$taxonomy_object_args );
 
 		// Establish a relationship between the post type and taxonomy.
-		\TDS\add_relationship( self::$post_object_name, self::$taxonomy_object_name );
+		\PRC\TDS\add_relationship( self::$post_object_name, self::$taxonomy_object_name );
 
 		// Register the post type's meta fields.
 		$this->register_dataset_fields();
@@ -274,27 +274,18 @@ class Content_Type {
 	/**
 	 * Adds rewrite rules for the dataset archive.
 	 *
-	 * @hook prc_platform_rewrite_rules
-	 *
-	 * @param array $rewrite_rules The rewrite rules.
-	 * @return array $rewrite_rules The modified rewrite rules.
+	 * @hook init
 	 */
-	public function archive_rewrites( $rewrite_rules ) {
-		return array_merge(
-			$rewrite_rules,
-			array(
-				'datasets/(\d\d\d\d)/page/?([0-9]{1,})/?$' => 'index.php?post_type=dataset&year=$matches[1]&paged=$matches[2]',
-			),
-			array(
-				'datasets/(\d\d\d\d)/?$' => 'index.php?post_type=dataset&year=$matches[1]',
-			),
-			array(
-				'datasets/page/?([0-9]{1,})/?$' => 'index.php?post_type=dataset&paged=$matches[1]',
-			),
-			array(
-				'datasets/?$' => 'index.php?post_type=dataset',
-			),
+	public function archive_rewrites() {
+		$rules = array(
+			'datasets/(\d\d\d\d)/page/?([0-9]{1,})/?$' => 'index.php?post_type=dataset&year=$matches[1]&paged=$matches[2]',
+			'datasets/(\d\d\d\d)/?$'                   => 'index.php?post_type=dataset&year=$matches[1]',
+			'datasets/page/?([0-9]{1,})/?$'             => 'index.php?post_type=dataset&paged=$matches[1]',
+			'datasets/?$'                               => 'index.php?post_type=dataset',
 		);
+		foreach ( $rules as $rule => $query ) {
+			add_rewrite_rule( $rule, $query, 'top' );
+		}
 	}
 
 	/**
@@ -335,7 +326,7 @@ class Content_Type {
 
 		$term_id = get_queried_object()->term_id;
 		// Get the associated post ID...
-		$dataset_id = \TDS\get_related_post( $term_id, self::$taxonomy_object_name );
+		$dataset_id = \PRC\TDS\get_related_post( $term_id, self::$taxonomy_object_name );
 
 		if ( is_wp_error( $dataset_id ) ) {
 			return;

@@ -30,13 +30,22 @@ namespace PRC\Platform\Datasets;
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       prc-datasets
  * Domain Path:       /languages
- * Requires Plugins:  prc-platform-core
+ * Requires Plugins:  prc-scripts, prc-post-publish-pipeline
  */
 
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
+
+// Load the Jetpack Autoloader so runtime version-selection can pick the
+// highest version across all plugins that ship the same library dep
+// (matches the prc-platform-core pattern).
+$prc_datasets_autoloader = __DIR__ . '/vendor/autoload_packages.php';
+if ( file_exists( $prc_datasets_autoloader ) ) {
+	require_once $prc_datasets_autoloader;
+}
+unset( $prc_datasets_autoloader );
 
 /**
  * Currently plugin version.

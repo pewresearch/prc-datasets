@@ -37,90 +37,92 @@ class Rest_API {
 	 * Initialize the REST API.
 	 */
 	public function init() {
-		$this->loader->add_filter( 'prc_api_endpoints', $this, 'register_dataset_endpoints' );
+		$this->loader->add_action( 'rest_api_init', $this, 'register_dataset_endpoints' );
 	}
 
 	/**
-	 * Registers the download endpoint. Checks the nonce against user credentials and
-	 *
-	 * @hook prc_api_endpoints
-	 * @param array $endpoints The endpoints.
-	 * @return array $endpoints The endpoints.
+	 * @hook rest_api_init
 	 */
-	public function register_dataset_endpoints( $endpoints ) {
-		$get_download_endpoint = array(
-			'route'               => 'datasets/get-download',
-			'methods'             => 'POST',
-			'args'                => array(
-				'dataset_id' => array(
-					'required' => true,
-					'type'     => 'integer',
+	public function register_dataset_endpoints() {
+		register_rest_route(
+			'prc-api/v3',
+			'datasets/get-download',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'restfully_download_dataset' ),
+				'args'                => array(
+					'dataset_id' => array(
+						'required' => true,
+						'type'     => 'integer',
+					),
 				),
-			),
-			'callback'            => array( $this, 'restfully_download_dataset' ),
-			'permission_callback' => function ( WP_REST_Request $request ) {
-				return true;
-			},
+				'permission_callback' => function ( WP_REST_Request $request ) {
+					return true;
+				},
+			)
 		);
-
-		$check_atp_endpoint = array(
-			'route'               => 'datasets/check-atp',
-			'methods'             => 'POST',
-			'callback'            => array( $this, 'restfully_check_atp_acceptance' ),
-			'permission_callback' => function ( WP_REST_Request $request ) {
-				return true;
-			},
+		register_rest_route(
+			'prc-api/v3',
+			'datasets/check-atp',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'restfully_check_atp_acceptance' ),
+				'args'                => array(),
+				'permission_callback' => function ( WP_REST_Request $request ) {
+					return true;
+				},
+			)
 		);
-
-		$accept_atp_endpoint = array(
-			'route'               => 'datasets/accept-atp',
-			'methods'             => 'POST',
-			'callback'            => array( $this, 'restfully_accept_atp' ),
-			'permission_callback' => function ( WP_REST_Request $request ) {
-				return true;
-			},
+		register_rest_route(
+			'prc-api/v3',
+			'datasets/accept-atp',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'restfully_accept_atp' ),
+				'args'                => array(),
+				'permission_callback' => function ( WP_REST_Request $request ) {
+					return true;
+				},
+			)
 		);
-
-		$log_download_endpoint = array(
-			'route'               => 'datasets/log-download',
-			'methods'             => 'POST',
-			'callback'            => array( $this, 'restfully_log_download' ),
-			'args'                => array(
-				'dataset_id' => array(
-					'required' => true,
-					'type'     => 'integer',
+		register_rest_route(
+			'prc-api/v3',
+			'datasets/log-download',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'restfully_log_download' ),
+				'args'                => array(
+					'dataset_id' => array(
+						'required' => true,
+						'type'     => 'integer',
+					),
 				),
-			),
-			'permission_callback' => function ( WP_REST_Request $request ) {
-				$nonce = $request->get_header( 'X-WP-Nonce' );
-				if ( empty( $nonce ) ) {
-					return false;
-				}
-				return true;
-			},
+				'permission_callback' => function ( WP_REST_Request $request ) {
+					$nonce = $request->get_header( 'X-WP-Nonce' );
+					if ( empty( $nonce ) ) {
+						return false;
+					}
+					return true;
+				},
+			)
 		);
-
-		$download_stats_endpoint = array(
-			'route'               => 'datasets/download-stats',
-			'methods'             => 'GET',
-			'callback'            => array( $this, 'restfully_get_download_stats' ),
-			'args'                => array(
-				'dataset_id' => array(
-					'required' => true,
-					'type'     => 'integer',
+		register_rest_route(
+			'prc-api/v3',
+			'datasets/download-stats',
+			array(
+				'methods'             => 'GET',
+				'callback'            => array( $this, 'restfully_get_download_stats' ),
+				'args'                => array(
+					'dataset_id' => array(
+						'required' => true,
+						'type'     => 'integer',
+					),
 				),
-			),
-			'permission_callback' => function () {
-				return current_user_can( 'edit_posts' );
-			},
+				'permission_callback' => function () {
+					return current_user_can( 'edit_posts' );
+				},
+			)
 		);
-
-		array_push( $endpoints, $get_download_endpoint );
-		array_push( $endpoints, $check_atp_endpoint );
-		array_push( $endpoints, $accept_atp_endpoint );
-		array_push( $endpoints, $log_download_endpoint );
-		array_push( $endpoints, $download_stats_endpoint );
-		return $endpoints;
 	}
 
 	/**
@@ -222,7 +224,9 @@ class Rest_API {
 		);
 		$rest_endpoint       = 'https://legacy.pewresearch.org' . $original_site_slug . '/wp-json' . $original_rest_route;
 
-		$response = \vip_safe_wp_remote_get( $rest_endpoint );
+		$response = function_exists( 'vip_safe_wp_remote_get' )
+			? \vip_safe_wp_remote_get( $rest_endpoint )
+			: wp_remote_get( $rest_endpoint ); // phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.wp_remote_get_wp_remote_get -- Fallback when VIP function is unavailable (wp-env, Playground).
 		if ( is_wp_error( $response ) ) {
 			return new WP_Error(
 				'datasets/failed-to-get-original-dataset-from-archive',

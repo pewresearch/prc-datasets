@@ -190,7 +190,7 @@ class Plugin {
 		}
 		if ( is_tax( Content_Type::$taxonomy_object_name ) || is_singular( Content_Type::$post_object_name ) ) {
 			$dataset_term_id = get_queried_object_id();
-			$dataset         = \TDS\get_related_post( $dataset_term_id, 'datasets' );
+			$dataset         = \PRC\TDS\get_related_post( $dataset_term_id, 'datasets' );
 			$dataset_id      = $dataset->ID;
 		} else {
 			$dataset_id = get_the_ID();

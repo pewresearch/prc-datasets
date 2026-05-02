@@ -10,7 +10,7 @@ $dataset_id = get_the_ID();
 // But, usually, we're going to be viewing these from the perspective of the datasets taxonomy archive, so use that to get the dataset id.
 if ( is_tax( 'datasets' ) ) {
 	$dataset_term_id = get_queried_object_id();
-	$dataset         = \TDS\get_related_post( $dataset_term_id, 'datasets' );
+	$dataset         = \PRC\TDS\get_related_post( $dataset_term_id, 'datasets' );
 	$dataset_id      = $dataset->ID;
 }
 $nonce  = wp_create_nonce( 'prc_platform_dataset_download' );

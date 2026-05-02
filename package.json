@@ -6,23 +6,16 @@
 	"description": "Provides Datasets functionality for PRC Platform, a hybrid post type that combines the features of a traditional post type with a taxonomy along with a digital rights management system for managing access to dataset files.",
 	"scripts": {
 		"build": "npm run build:blocks && npm run build:inspector-panel",
-		"build:blocks": "wp-scripts build --experimental-modules --webpack-copy-php; wp-scripts build-blocks-manifest",
+		"build:blocks": "wp-scripts build --experimental-modules --webpack-copy-php && wp-scripts build-blocks-manifest",
 		"build:inspector-panel": "wp-scripts build --source-path=includes/inspector-sidebar-panel/src --output-path=includes/inspector-sidebar-panel/build",
 		"start:blocks": "wp-scripts build-blocks-manifest; wp-scripts start --experimental-modules --webpack-copy-php",
-		"start:inspector-panel": "wp-scripts start --source-path=includes/inspector-sidebar-panel/src --output-path=includes/inspector-sidebar-panel/build",
-		"test": "wp-scripts test-playwright",
-		"test:env:clean": "wp-env clean all && wp-env start",
-		"test:env:destroy": "wp-env destroy",
-		"test:env:start": "wp-env start",
-		"test:env:stop": "wp-env stop"
+		"start:inspector-panel": "wp-scripts start --source-path=includes/inspector-sidebar-panel/src --output-path=includes/inspector-sidebar-panel/build"
 	},
 	"devDependencies": {
-		"@playwright/test": "^1.51.1",
-		"@wordpress/e2e-test-utils-playwright": "^1.21.0",
-		"@wordpress/env": "^10.21.0",
-		"@wordpress/scripts": "^30.14.1"
+		"@wordpress/scripts": "^31.4.0"
 	},
 	"dependencies": {
+		"@prc/functions": "*",
 		"@wordpress/icons": "^10.32.0"
 	},
 	"peerDependencies": {
