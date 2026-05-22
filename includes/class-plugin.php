@@ -131,9 +131,9 @@ class Plugin {
 		require_once plugin_dir_path( __DIR__ ) . 'includes/class-cli.php';
 
 		/**
-		 * The class responsible for syncing ATP dataset IDs to Firebase.
+		 * The class responsible for the build-audience CLI command.
 		 */
-		require_once plugin_dir_path( __DIR__ ) . 'includes/class-firebase-sync.php';
+		require_once plugin_dir_path( __DIR__ ) . 'includes/class-cli-build-audience.php';
 
 		$this->loader = new Loader();
 	}
@@ -162,7 +162,6 @@ class Plugin {
 	private function init_dependencies() {
 		new Content_Type( $this->get_loader() );
 		new Rest_API( $this->get_loader() );
-		new Firebase_Sync( $this->get_loader() );
 
 		wp_register_block_metadata_collection(
 			plugin_dir_path( __DIR__ ) . 'build',

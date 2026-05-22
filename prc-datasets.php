@@ -38,14 +38,15 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-// Load the Jetpack Autoloader so runtime version-selection can pick the
-// highest version across all plugins that ship the same library dep
-// (matches the prc-platform-core pattern).
-$prc_datasets_autoloader = __DIR__ . '/vendor/autoload_packages.php';
-if ( file_exists( $prc_datasets_autoloader ) ) {
-	require_once $prc_datasets_autoloader;
+// When running inside the PRC Platform monorepo the root autoloader already
+// provides every dependency; skip per-plugin Jetpack Autoloader initialization.
+if ( ! defined( 'PRC_PLATFORM' ) ) {
+	$prc_datasets_autoloader = __DIR__ . '/vendor/autoload_packages.php';
+	if ( file_exists( $prc_datasets_autoloader ) ) {
+		require_once $prc_datasets_autoloader;
+	}
+	unset( $prc_datasets_autoloader );
 }
-unset( $prc_datasets_autoloader );
 
 /**
  * Currently plugin version.

@@ -1,6 +1,6 @@
 # PRC Datasets
 
-Manages the `dataset` post type and `datasets` taxonomy as a linked pair (via [`prc/term-data-store`](https://github.com/pewresearch/term-data-store), namespace `PRC\TDS`), providing a digital-rights-management layer for file downloads, an ATP legal-acceptance gate, download telemetry, and Firebase sync for Cloud Function–computed user statistics.
+Manages the `dataset` post type and `datasets` taxonomy as a linked pair (via [`prc/term-data-store`](https://github.com/pewresearch/term-data-store), namespace `PRC\TDS`), providing a digital-rights-management layer for file downloads, an ATP legal-acceptance gate, download telemetry, and newsletter audience building via Firebase Cloud Functions.
 
 ## What it does
 
@@ -9,7 +9,7 @@ Manages the `dataset` post type and `datasets` taxonomy as a linked pair (via [`
 - Gated downloads — resolves the download file URL (media library attachment, legacy meta, or legacy archive fallback) only after verifying a nonce and a Firebase UID.
 - ATP (American Trends Panel) legal gate — marks individual datasets as ATP-restricted; users must accept the ATP Terms of Service before a download URL is returned.
 - Download telemetry — tracks a cumulative total (`_total_downloads`) and a per-year monthly breakdown (`_downloads_{year}`) stored as post meta; also logs each download against the Firebase user record.
-- Firebase sync — keeps `config/atp-dataset-ids` in Firebase up to date on every publish/update/trash/untrash event so Cloud Functions can compute user-level download statistics.
+- Newsletter audiences — `wp prc datasets build-audience` calls the `buildDatasetAudience` Cloud Function to resolve downloader emails for system-email newsletters.
 - Legacy archive fallback — if a dataset has no attachment ID, attempts to fetch the file URL from `legacy.pewresearch.org` via the REST API and enqueues an Action Scheduler job (`prc_dataset_recovery`) to migrate the file to the current site asynchronously.
 - Custom rewrite rules for `/datasets/`, `/datasets/{year}/`, and research-team-prefixed URLs like `/politics/dataset/{slug}/`.
 - Includes datasets in sitewide search results and FacetWP indexing.
@@ -23,8 +23,8 @@ Manages the `dataset` post type and `datasets` taxonomy as a linked pair (via [`
 |---|---|
 | `includes/class-content-type.php` | CPT/taxonomy registration, `prc/term-data-store` relationship, meta field registration, rewrite rules, research team URL config, search/FacetWP inclusion |
 | `includes/class-rest-api.php` | REST endpoint registration and all download/ATP/logging handlers |
-| `includes/class-firebase-sync.php` | Syncs ATP dataset IDs to Firebase on content lifecycle events |
 | `includes/class-cli.php` | WP-CLI commands under `wp prc datasets` |
+| `includes/class-cli-build-audience.php` | `wp prc datasets build-audience` — Firebase audience resolver |
 | `includes/class-plugin.php` | Bootstrap: loads classes, registers blocks, wires block bindings source, enqueues inspector panel |
 | `includes/inspector-sidebar-panel/src/index.js` | Editor sidebar plugin — file upload (`MediaDropZone`), ATP toggle, pre-publish panel |
 | `includes/inspector-sidebar-panel/src/stats-panel.js` | Monthly download heatmap component rendered inside the sidebar |
@@ -78,11 +78,6 @@ The `dataset` post type also gets a `_downloads` REST field that exposes the sam
 | `prc_platform_pub_listing_default_args` | Filter | prc-pub-listing | Adds `dataset` to `post_type` when a search string is present |
 | `prc_platform__facetwp_indexer_query_args` | Filter | prc-facets | Adds `dataset` to the FacetWP indexer query so datasets are facetable |
 | `rest_api_init` | Action | WordPress core | Registers the five dataset REST endpoints directly |
-| `prc_platform_on_publish` | Action | prc-platform-core | Triggers Firebase ATP ID sync on publish |
-| `prc_platform_on_update` | Action | prc-platform-core | Triggers Firebase ATP ID sync on update |
-| `prc_platform_on_trash` | Action | prc-platform-core | Triggers Firebase ATP ID sync on trash |
-| `prc_platform_on_untrash` | Action | prc-platform-core | Triggers Firebase ATP ID sync on untrash |
-
 ## Post meta
 
 | Key | Type | Description |
@@ -97,20 +92,15 @@ The `dataset` post type also gets a `_downloads` REST field that exposes the sam
 Registered as `wp prc datasets <subcommand>`.
 
 ```bash
-# Aggregate ATP download counts by year
+# Aggregate ATP download counts by year (WordPress post meta)
 wp prc datasets atp-downloads [--year=<year>] [--detailed] [--per-dataset] [--format=<table|csv|json|yaml>]
 
-# Read pre-computed user statistics from Firebase (computed daily by Cloud Function)
-wp prc datasets atp-user-stats [--include-distribution] [--refresh] [--format=<format>]
-
-# Push current list of ATP dataset IDs to Firebase config/atp-dataset-ids
-wp prc datasets sync-atp-ids
+# Build newsletter audience from Firebase users who downloaded a dataset
+wp prc datasets build-audience --dataset-id=<id> [--dry-run] [--no-create-post] [--label=<text>] [--include-unverified]
 
 # Find datasets missing an attached download file
 wp prc datasets missing-files [--dry-run]
 ```
-
-`atp-user-stats --refresh` runs `sync-atp-ids` before reading Firebase, which is useful when Cloud Function stats seem stale.
 
 ## Dependencies
 
