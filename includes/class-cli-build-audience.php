@@ -18,6 +18,7 @@ declare(strict_types=1);
 
 namespace PRC\Platform\Datasets;
 
+use PRC\Platform\CLI_Audience_Verification;
 use WP_CLI;
 use WP_CLI_Command;
 use WP_CLI\Utils;
@@ -26,10 +27,14 @@ if ( ! defined( 'WP_CLI' ) || ! WP_CLI ) {
 	return;
 }
 
+require_once dirname( __DIR__, 2 ) . '/prc-firebase/includes/trait-cli-audience-verification.php';
+
 /**
  * Builds a newsletter recipient audience from Firebase dataset downloaders.
  */
 class CLI_Build_Audience extends WP_CLI_Command {
+
+	use CLI_Audience_Verification;
 
 	/**
 	 * wp_options key prefix for audience email lists.
@@ -58,35 +63,41 @@ class CLI_Build_Audience extends WP_CLI_Command {
 	 * : Persist the audience in wp_options but skip creating a newsletter draft.
 	 *
 	 * [--label=<text>]
-	 * : Human-readable label for this audience. Defaults to "Dataset <id> downloaders".
+	 * : Human-readable label for this audience. Defaults to "Dataset <id> downloaders (mode)".
+	 *
+	 * [--only-verified]
+	 * : Include only users with a verified Firebase email (default when no verification flag is passed).
+	 *
+	 * [--only-unverified]
+	 * : Include only users with an unverified Firebase email (must have an email on file).
 	 *
 	 * [--include-unverified]
-	 * : Include users whose Firebase email address is not verified. Defaults to
-	 *   excluding unverified accounts.
+	 * : Include all users with an email on file (verified and unverified). Mutually exclusive with the other verification flags.
 	 *
 	 * ## EXAMPLES
 	 *
-	 *     # Dry-run: see how many users downloaded dataset 12345
+	 *     # Dry-run: verified downloaders for dataset 12345
 	 *     wp prc datasets build-audience --dataset-id=12345 --dry-run
 	 *
-	 *     # Build audience and create a draft newsletter
-	 *     wp prc datasets build-audience --dataset-id=12345
+	 *     # Build verified-only audience and create a draft newsletter
+	 *     wp prc datasets build-audience --dataset-id=12345 --only-verified
 	 *
-	 *     # Build with a custom label, skip post creation
-	 *     wp prc datasets build-audience --dataset-id=12345 --no-create-post --label="ANES 2024 Downloaders"
+	 *     # Unverified-only list (separate wp_options key)
+	 *     wp prc datasets build-audience --dataset-id=12345 --only-unverified --no-create-post
 	 *
-	 *     # Include users who never verified their email
-	 *     wp prc datasets build-audience --dataset-id=12345 --include-unverified
+	 *     # All recipients with an email (verified + unverified)
+	 *     wp prc datasets build-audience --dataset-id=12345 --include-unverified --no-create-post
 	 *
 	 * @param array $args       Positional arguments (unused).
 	 * @param array $assoc_args Associative arguments.
 	 */
 	public function __invoke( $args, $assoc_args ) {
-		$dataset_id        = (int) Utils\get_flag_value( $assoc_args, 'dataset-id', 0 );
-		$dry_run           = (bool) Utils\get_flag_value( $assoc_args, 'dry-run', false );
-		$no_create_post    = (bool) Utils\get_flag_value( $assoc_args, 'no-create-post', false );
-		$label             = Utils\get_flag_value( $assoc_args, 'label', null );
-		$include_unverified = (bool) Utils\get_flag_value( $assoc_args, 'include-unverified', false );
+		$dataset_id     = (int) Utils\get_flag_value( $assoc_args, 'dataset-id', 0 );
+		$dry_run        = (bool) Utils\get_flag_value( $assoc_args, 'dry-run', false );
+		$no_create_post = (bool) Utils\get_flag_value( $assoc_args, 'no-create-post', false );
+		$label          = Utils\get_flag_value( $assoc_args, 'label', null );
+
+		$verification = self::resolve_verification_mode( $assoc_args );
 
 		// ── Validate dataset ──────────────────────────────────────────────────
 		if ( $dataset_id <= 0 ) {
@@ -122,24 +133,27 @@ class CLI_Build_Audience extends WP_CLI_Command {
 
 		// ── Call the Cloud Function ───────────────────────────────────────────
 		WP_CLI::line( sprintf(
-			'Calling buildDatasetAudience for dataset %d ("%s")…',
+			'Calling buildDatasetAudience for dataset %d ("%s", verification=%s)…',
 			$dataset_id,
-			$dataset->post_title
+			$dataset->post_title,
+			$verification
 		) );
 
 		$response = wp_remote_post(
 			$endpoint,
-			[
+			array(
 				'timeout' => 540,
-				'headers' => [
+				'headers' => array(
 					'Authorization' => 'Bearer ' . $id_token,
 					'Content-Type'  => 'application/json',
-				],
-				'body'    => wp_json_encode( [
-					'dataset_id'       => $dataset_id,
-					'require_verified' => ! $include_unverified,
-				] ),
-			]
+				),
+				'body'    => wp_json_encode(
+					self::build_audience_request_body(
+						array( 'dataset_id' => $dataset_id ),
+						$verification
+					)
+				),
+			)
 		);
 
 		if ( is_wp_error( $response ) ) {
@@ -149,22 +163,28 @@ class CLI_Build_Audience extends WP_CLI_Command {
 		$status_code = wp_remote_retrieve_response_code( $response );
 		$body        = json_decode( wp_remote_retrieve_body( $response ), true );
 
-		if ( $status_code !== 200 || empty( $body['success'] ) ) {
+		if ( 200 !== $status_code || empty( $body['success'] ) ) {
 			$detail = $body['error'] ?? "HTTP {$status_code}";
 			WP_CLI::error( "Firebase function returned an error: {$detail}" );
 		}
 
-		$emails        = $body['emails'] ?? [];
+		// Fail closed unless the function confirmed the requested cohort. This
+		// catches outdated deployments that would otherwise return a different
+		// (e.g. broader) audience than --only-unverified asked for.
+		$verification = self::assert_response_verification( $body, $verification );
+
+		$emails        = $body['emails'] ?? array();
 		$count         = (int) ( $body['count'] ?? count( $emails ) );
 		$scanned_users = (int) ( $body['scanned_users'] ?? 0 );
 		$matched_users = (int) ( $body['matched_users'] ?? 0 );
 		$built_at      = $body['built_at'] ?? current_time( 'mysql', true );
 
 		WP_CLI::line( sprintf(
-			'Scanned %s users → %s matched → %s valid email(s).',
+			'Scanned %s users → %s matched → %s email(s) (%s).',
 			number_format( $scanned_users ),
 			number_format( $matched_users ),
-			number_format( $count )
+			number_format( $count ),
+			$verification
 		) );
 
 		if ( $dry_run ) {
@@ -173,22 +193,27 @@ class CLI_Build_Audience extends WP_CLI_Command {
 		}
 
 		// ── Persist to wp_options ─────────────────────────────────────────────
-		$audience_key = self::AUDIENCE_OPTION_PREFIX . $dataset_id;
+		$audience_key = self::AUDIENCE_OPTION_PREFIX . $dataset_id . '_' . $verification;
 		$meta_key     = $audience_key . '_meta';
-		$final_label  = $label ?? sprintf( 'Dataset %d downloaders', $dataset_id );
+		$final_label  = $label ?? sprintf(
+			'%s downloaders%s',
+			$dataset->post_title,
+			self::verification_label_suffix( $verification )
+		);
 
 		update_option( $audience_key, $emails, false );
 		update_option(
 			$meta_key,
-			[
+			array(
 				'label'         => $final_label,
 				'count'         => $count,
+				'verification'  => $verification,
 				'dataset_id'    => $dataset_id,
 				'dataset_title' => $dataset->post_title,
 				'scanned_users' => $scanned_users,
 				'matched_users' => $matched_users,
 				'built_at'      => $built_at,
-			],
+			),
 			false
 		);
 
@@ -207,7 +232,6 @@ class CLI_Build_Audience extends WP_CLI_Command {
 			return;
 		}
 
-		// Soft-check that prc_newsletter post type is registered.
 		if ( ! post_type_exists( 'prc_newsletter' ) ) {
 			WP_CLI::warning(
 				'The "prc_newsletter" post type is not registered. ' .
@@ -221,16 +245,29 @@ class CLI_Build_Audience extends WP_CLI_Command {
 			return;
 		}
 
-		$post_id = wp_insert_post( [
-			'post_type'   => 'prc_newsletter',
-			'post_status' => 'draft',
-			'post_title'  => sprintf( 'Update for %s downloaders', $dataset->post_title ),
-			'meta_input'  => [
-				'prc_newsletter_delivery_mode'       => 'mandrill',
-				'prc_newsletter_audience_option_key' => $audience_key,
-				'prc_newsletter_subject'             => sprintf( 'Update: %s', $dataset->post_title ),
-			],
-		], true );
+		$mode_title = self::verification_title_fragment( $verification );
+
+		$post_id = wp_insert_post(
+			array(
+				'post_type'   => 'prc_newsletter',
+				'post_status' => 'draft',
+				'post_title'  => sprintf(
+					'Update for %s downloaders%s',
+					$dataset->post_title,
+					$mode_title
+				),
+				'meta_input'  => array(
+					'prc_newsletter_delivery_mode'       => 'mandrill',
+					'prc_newsletter_audience_option_key' => $audience_key,
+					'prc_newsletter_subject'             => sprintf(
+						'Update: %s%s',
+						$dataset->post_title,
+						$mode_title
+					),
+				),
+			),
+			true
+		);
 
 		if ( is_wp_error( $post_id ) ) {
 			WP_CLI::warning( 'Could not create newsletter draft: ' . $post_id->get_error_message() );
