@@ -1,9 +1,9 @@
 
-> @prc/datasets@1.0.0 build
+> @prc/datasets@1.1.0 build
 > npm run build:blocks && npm run build:inspector-panel
 
 
-> @prc/datasets@1.0.0 build:blocks
+> @prc/datasets@1.1.0 build:blocks
 > wp-scripts build --experimental-modules --webpack-copy-php && wp-scripts build-blocks-manifest
 
 assets by path [1m[32mdownload-block/[39m[22m 7.57 KiB
@@ -33,7 +33,7 @@ built modules 8.62 KiB (javascript) 1.38 KiB (css/mini-extract) [1m[33m[built]
   cacheable modules 1.38 KiB
     css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]![1m./src/dataset-atp-legal-acceptance-block/style.scss[39m[22m 318 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
     css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]![1m./src/download-block/style.scss[39m[22m 1.06 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-webpack 5.106.2 compiled [1m[32msuccessfully[39m[22m in 6473 ms
+webpack 5.106.2 compiled [1m[32msuccessfully[39m[22m in 11018 ms
 
 assets by path [1m[32mdataset-atp-legal-acceptance-block/[39m[22m 8.38 KiB
   asset [1m[32mdataset-atp-legal-acceptance-block/view.js[39m[22m 8.26 KiB [1m[32m[emitted][39m[22m [javascript module] [1m[32m[minimized][39m[22m (name: dataset-atp-legal-acceptance-block/view)
@@ -46,10 +46,10 @@ Entrypoint [1mdownload-block/view[39m[22m 1.69 KiB = [1m[32mdownload-block/
 orphan modules 42 bytes [1m[33m[orphan][39m[22m 1 module
 [1m./src/dataset-atp-legal-acceptance-block/view.js + 1 modules[39m[22m 8.97 KiB [1m[31m[not cacheable][39m[22m [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
 [1m./src/download-block/view.js + 1 modules[39m[22m 3.54 KiB [1m[31m[not cacheable][39m[22m [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-webpack 5.106.2 compiled [1m[32msuccessfully[39m[22m in 3639 ms
+webpack 5.106.2 compiled [1m[32msuccessfully[39m[22m in 6115 ms
 Block metadata PHP file generated at: build/blocks-manifest.php
 
-> @prc/datasets@1.0.0 build:inspector-panel
+> @prc/datasets@1.1.0 build:inspector-panel
 > wp-scripts build --source-path=includes/inspector-sidebar-panel/src --output-path=includes/inspector-sidebar-panel/build
 
 assets by path [1m[32m*.css[39m[22m 3.17 KiB
@@ -63,4 +63,4 @@ runtime modules 663 bytes 3 modules
 built modules 9.14 KiB (javascript) 1.58 KiB (css/mini-extract) [1m[33m[built][39m[22m
   [1m./includes/inspector-sidebar-panel/src/index.js + 16 modules[39m[22m 9.14 KiB [1m[31m[not cacheable][39m[22m [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
   css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]![1m./includes/inspector-sidebar-panel/src/stats-panel.scss[39m[22m 1.58 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-webpack 5.106.2 compiled [1m[32msuccessfully[39m[22m in 6008 ms
+webpack 5.106.2 compiled [1m[32msuccessfully[39m[22m in 5796 ms

@@ -163,6 +163,11 @@ class Plugin {
 		new Content_Type( $this->get_loader() );
 		new Rest_API( $this->get_loader() );
 
+		if ( class_exists( 'PRC\Platform\Markdown_For_Agents\LLMs_Txt' ) ) {
+			require_once plugin_dir_path( __DIR__ ) . 'includes/class-llms-txt-section.php';
+			new Llms_Txt_Section( $this->get_loader() );
+		}
+
 		wp_register_block_metadata_collection(
 			plugin_dir_path( __DIR__ ) . 'build',
 			plugin_dir_path( __DIR__ ) . 'build/blocks-manifest.php'
