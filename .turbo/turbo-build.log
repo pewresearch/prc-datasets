@@ -6,61 +6,61 @@
 > @prc/datasets@1.0.0 build:blocks
 > wp-scripts build --experimental-modules --webpack-copy-php && wp-scripts build-blocks-manifest
 
-assets by path download-block/ 7.57 KiB
+assets by path [1m[32mdownload-block/[39m[22m 7.57 KiB
   assets by chunk 2.47 KiB (name: download-block/index) 2 assets
-  assets by path download-block/*.css 2.13 KiB 2 assets
-  asset download-block/render.php 2.23 KiB [emitted] [from: src/download-block/render.php] [copied]
-  asset download-block/block.json 752 bytes [emitted] [from: src/download-block/block.json] [copied]
-assets by path dataset-atp-legal-acceptance-block/ 4.59 KiB
+  assets by path [1m[32mdownload-block/*.css[39m[22m 2.13 KiB 2 assets
+  asset [1m[32mdownload-block/render.php[39m[22m 2.23 KiB [1m[32m[emitted][39m[22m [from: src/download-block/render.php] [1m[32m[copied][39m[22m
+  asset [1m[32mdownload-block/block.json[39m[22m 752 bytes [1m[32m[emitted][39m[22m [from: src/download-block/block.json] [1m[32m[copied][39m[22m
+assets by path [1m[32mdataset-atp-legal-acceptance-block/[39m[22m 4.59 KiB
   assets by chunk 2.13 KiB (name: dataset-atp-legal-acceptance-block/index) 2 assets
   assets by chunk 638 bytes (id hint: style) 2 assets
-  asset dataset-atp-legal-acceptance-block/render.php 1.16 KiB [emitted] [from: src/dataset-atp-legal-acceptance-block/render.php] [copied]
-  asset dataset-atp-legal-acceptance-block/block.json 689 bytes [emitted] [from: src/dataset-atp-legal-acceptance-block/block.json] [copied]
-assets by path dataset-description-block/ 991 bytes
-  asset dataset-description-block/index.js 556 bytes [emitted] [minimized] (name: dataset-description-block/index)
-  asset dataset-description-block/block.json 340 bytes [emitted] [from: src/dataset-description-block/block.json] [copied]
-  asset dataset-description-block/index.asset.php 95 bytes [emitted] (name: dataset-description-block/index)
-Entrypoint dataset-atp-legal-acceptance-block/index 2.75 KiB = dataset-atp-legal-acceptance-block/style-index.css 319 bytes dataset-atp-legal-acceptance-block/style-index-rtl.css 319 bytes dataset-atp-legal-acceptance-block/index.js 1.98 KiB dataset-atp-legal-acceptance-block/index.asset.php 152 bytes
-Entrypoint dataset-description-block/index 651 bytes = dataset-description-block/index.js 556 bytes dataset-description-block/index.asset.php 95 bytes
-Entrypoint download-block/index 4.61 KiB = download-block/style-index.css 1.07 KiB download-block/style-index-rtl.css 1.07 KiB download-block/index.js 2.29 KiB download-block/index.asset.php 183 bytes
-orphan modules 219 KiB (javascript) 1.83 KiB (runtime) [orphan] 340 modules
+  asset [1m[32mdataset-atp-legal-acceptance-block/render.php[39m[22m 1.16 KiB [1m[32m[emitted][39m[22m [from: src/dataset-atp-legal-acceptance-block/render.php] [1m[32m[copied][39m[22m
+  asset [1m[32mdataset-atp-legal-acceptance-block/block.json[39m[22m 689 bytes [1m[32m[emitted][39m[22m [from: src/dataset-atp-legal-acceptance-block/block.json] [1m[32m[copied][39m[22m
+assets by path [1m[32mdataset-description-block/[39m[22m 991 bytes
+  asset [1m[32mdataset-description-block/index.js[39m[22m 556 bytes [1m[32m[emitted][39m[22m [1m[32m[minimized][39m[22m (name: dataset-description-block/index)
+  asset [1m[32mdataset-description-block/block.json[39m[22m 340 bytes [1m[32m[emitted][39m[22m [from: src/dataset-description-block/block.json] [1m[32m[copied][39m[22m
+  asset [1m[32mdataset-description-block/index.asset.php[39m[22m 95 bytes [1m[32m[emitted][39m[22m (name: dataset-description-block/index)
+Entrypoint [1mdataset-atp-legal-acceptance-block/index[39m[22m 2.75 KiB = [1m[32mdataset-atp-legal-acceptance-block/style-index.css[39m[22m 319 bytes [1m[32mdataset-atp-legal-acceptance-block/style-index-rtl.css[39m[22m 319 bytes [1m[32mdataset-atp-legal-acceptance-block/index.js[39m[22m 1.98 KiB [1m[32mdataset-atp-legal-acceptance-block/index.asset.php[39m[22m 152 bytes
+Entrypoint [1mdataset-description-block/index[39m[22m 651 bytes = [1m[32mdataset-description-block/index.js[39m[22m 556 bytes [1m[32mdataset-description-block/index.asset.php[39m[22m 95 bytes
+Entrypoint [1mdownload-block/index[39m[22m 4.61 KiB = [1m[32mdownload-block/style-index.css[39m[22m 1.07 KiB [1m[32mdownload-block/style-index-rtl.css[39m[22m 1.07 KiB [1m[32mdownload-block/index.js[39m[22m 2.29 KiB [1m[32mdownload-block/index.asset.php[39m[22m 183 bytes
+orphan modules 219 KiB (javascript) 1.83 KiB (runtime) [1m[33m[orphan][39m[22m 340 modules
 runtime modules 5 KiB 6 modules
-built modules 8.62 KiB (javascript) 1.38 KiB (css/mini-extract) [built]
+built modules 8.62 KiB (javascript) 1.38 KiB (css/mini-extract) [1m[33m[built][39m[22m
   javascript modules 8.62 KiB
-    ./src/dataset-atp-legal-acceptance-block/index.js + 7 modules 3.15 KiB [not cacheable] [built] [code generated]
-    ./src/dataset-description-block/index.js + 1 modules 698 bytes [not cacheable] [built] [code generated]
-    ./src/download-block/index.js + 10 modules 4.78 KiB [not cacheable] [built] [code generated]
+    [1m./src/dataset-atp-legal-acceptance-block/index.js + 7 modules[39m[22m 3.15 KiB [1m[31m[not cacheable][39m[22m [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+    [1m./src/dataset-description-block/index.js + 1 modules[39m[22m 698 bytes [1m[31m[not cacheable][39m[22m [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+    [1m./src/download-block/index.js + 10 modules[39m[22m 4.78 KiB [1m[31m[not cacheable][39m[22m [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
   cacheable modules 1.38 KiB
-    css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]!./src/dataset-atp-legal-acceptance-block/style.scss 318 bytes [built] [code generated]
-    css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]!./src/download-block/style.scss 1.06 KiB [built] [code generated]
-webpack 5.106.2 compiled successfully in 4147 ms
+    css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]![1m./src/dataset-atp-legal-acceptance-block/style.scss[39m[22m 318 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+    css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]![1m./src/download-block/style.scss[39m[22m 1.06 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+webpack 5.106.2 compiled [1m[32msuccessfully[39m[22m in 14131 ms
 
-assets by path dataset-atp-legal-acceptance-block/ 8.38 KiB
-  asset dataset-atp-legal-acceptance-block/view.js 8.26 KiB [emitted] [javascript module] [minimized] (name: dataset-atp-legal-acceptance-block/view)
-  asset dataset-atp-legal-acceptance-block/view.asset.php 130 bytes [emitted] (name: dataset-atp-legal-acceptance-block/view)
-assets by path download-block/ 1.69 KiB
-  asset download-block/view.js 1.57 KiB [emitted] [javascript module] [minimized] (name: download-block/view)
-  asset download-block/view.asset.php 130 bytes [emitted] (name: download-block/view)
-Entrypoint dataset-atp-legal-acceptance-block/view 8.38 KiB = dataset-atp-legal-acceptance-block/view.js 8.26 KiB dataset-atp-legal-acceptance-block/view.asset.php 130 bytes
-Entrypoint download-block/view 1.69 KiB = download-block/view.js 1.57 KiB download-block/view.asset.php 130 bytes
-orphan modules 42 bytes [orphan] 1 module
-./src/dataset-atp-legal-acceptance-block/view.js + 1 modules 8.97 KiB [not cacheable] [built] [code generated]
-./src/download-block/view.js + 1 modules 3.54 KiB [not cacheable] [built] [code generated]
-webpack 5.106.2 compiled successfully in 2325 ms
+assets by path [1m[32mdataset-atp-legal-acceptance-block/[39m[22m 8.38 KiB
+  asset [1m[32mdataset-atp-legal-acceptance-block/view.js[39m[22m 8.26 KiB [1m[32m[emitted][39m[22m [javascript module] [1m[32m[minimized][39m[22m (name: dataset-atp-legal-acceptance-block/view)
+  asset [1m[32mdataset-atp-legal-acceptance-block/view.asset.php[39m[22m 130 bytes [1m[32m[emitted][39m[22m (name: dataset-atp-legal-acceptance-block/view)
+assets by path [1m[32mdownload-block/[39m[22m 1.69 KiB
+  asset [1m[32mdownload-block/view.js[39m[22m 1.57 KiB [1m[32m[emitted][39m[22m [javascript module] [1m[32m[minimized][39m[22m (name: download-block/view)
+  asset [1m[32mdownload-block/view.asset.php[39m[22m 130 bytes [1m[32m[emitted][39m[22m (name: download-block/view)
+Entrypoint [1mdataset-atp-legal-acceptance-block/view[39m[22m 8.38 KiB = [1m[32mdataset-atp-legal-acceptance-block/view.js[39m[22m 8.26 KiB [1m[32mdataset-atp-legal-acceptance-block/view.asset.php[39m[22m 130 bytes
+Entrypoint [1mdownload-block/view[39m[22m 1.69 KiB = [1m[32mdownload-block/view.js[39m[22m 1.57 KiB [1m[32mdownload-block/view.asset.php[39m[22m 130 bytes
+orphan modules 42 bytes [1m[33m[orphan][39m[22m 1 module
+[1m./src/dataset-atp-legal-acceptance-block/view.js + 1 modules[39m[22m 8.97 KiB [1m[31m[not cacheable][39m[22m [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+[1m./src/download-block/view.js + 1 modules[39m[22m 3.54 KiB [1m[31m[not cacheable][39m[22m [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+webpack 5.106.2 compiled [1m[32msuccessfully[39m[22m in 7676 ms
 Block metadata PHP file generated at: build/blocks-manifest.php
 
 > @prc/datasets@1.0.0 build:inspector-panel
 > wp-scripts build --source-path=includes/inspector-sidebar-panel/src --output-path=includes/inspector-sidebar-panel/build
 
-assets by path *.css 3.17 KiB
-  asset index-rtl.css 1.59 KiB [emitted] (name: index)
-  asset index.css 1.59 KiB [emitted] (name: index)
-asset index.js 4.17 KiB [emitted] [minimized] (name: index)
-asset index.asset.php 281 bytes [emitted] (name: index)
-Entrypoint index 7.62 KiB = index.css 1.59 KiB index.js 4.17 KiB index-rtl.css 1.59 KiB index.asset.php 281 bytes
-orphan modules 218 KiB (javascript) 937 bytes (runtime) [orphan] 336 modules
+assets by path [1m[32m*.css[39m[22m 3.17 KiB
+  asset [1m[32mindex-rtl.css[39m[22m 1.59 KiB [1m[32m[emitted][39m[22m (name: index)
+  asset [1m[32mindex.css[39m[22m 1.59 KiB [1m[32m[emitted][39m[22m (name: index)
+asset [1m[32mindex.js[39m[22m 4.17 KiB [1m[32m[emitted][39m[22m [1m[32m[minimized][39m[22m (name: index)
+asset [1m[32mindex.asset.php[39m[22m 281 bytes [1m[32m[emitted][39m[22m (name: index)
+Entrypoint [1mindex[39m[22m 7.62 KiB = [1m[32mindex.css[39m[22m 1.59 KiB [1m[32mindex.js[39m[22m 4.17 KiB [1m[32mindex-rtl.css[39m[22m 1.59 KiB [1m[32mindex.asset.php[39m[22m 281 bytes
+orphan modules 218 KiB (javascript) 937 bytes (runtime) [1m[33m[orphan][39m[22m 336 modules
 runtime modules 663 bytes 3 modules
-built modules 9.14 KiB (javascript) 1.58 KiB (css/mini-extract) [built]
-  ./includes/inspector-sidebar-panel/src/index.js + 16 modules 9.14 KiB [not cacheable] [built] [code generated]
-  css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]!./includes/inspector-sidebar-panel/src/stats-panel.scss 1.58 KiB [built] [code generated]
-webpack 5.106.2 compiled successfully in 3630 ms
+built modules 9.14 KiB (javascript) 1.58 KiB (css/mini-extract) [1m[33m[built][39m[22m
+  [1m./includes/inspector-sidebar-panel/src/index.js + 16 modules[39m[22m 9.14 KiB [1m[31m[not cacheable][39m[22m [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+  css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]![1m./includes/inspector-sidebar-panel/src/stats-panel.scss[39m[22m 1.58 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+webpack 5.106.2 compiled [1m[32msuccessfully[39m[22m in 13139 ms
