@@ -12,9 +12,6 @@ return array(
 		'attributes' => array(
 			'datasetId' => array(
 				'type' => 'string'
-			),
-			'nonce' => array(
-				'type' => 'string'
 			)
 		),
 		'supports' => array(

@@ -46,10 +46,10 @@ All endpoints are registered under `prc-api/v3` on `rest_api_init`.
 
 | Method | Route | Auth | Description |
 |---|---|---|---|
-| `POST` | `/prc-api/v3/datasets/get-download` | Nonce (`prc_platform_dataset_download`) + Firebase UID in body | Resolves and returns the download file URL; increments counters and logs the download |
-| `POST` | `/prc-api/v3/datasets/check-atp` | Nonce + Firebase UID in body | Returns whether the user has accepted the ATP agreement |
-| `POST` | `/prc-api/v3/datasets/accept-atp` | Nonce + Firebase UID in body | Records ATP acceptance on the user's Firebase record |
-| `POST` | `/prc-api/v3/datasets/log-download` | `X-WP-Nonce` header | Separately logs a download (total + monthly + user record) without resolving a URL |
+| `POST` | `/prc-api/v3/datasets/get-download` | Firebase UID + rate limit | Resolves and returns the download file URL; increments counters and logs the download |
+| `POST` | `/prc-api/v3/datasets/check-atp` | Firebase UID in request | Returns whether the user has accepted the ATP agreement |
+| `POST` | `/prc-api/v3/datasets/accept-atp` | Firebase UID in request | Records ATP acceptance on the user's Firebase record |
+| `POST` | `/prc-api/v3/datasets/log-download` | Firebase UID in request | Separately logs a download (total + monthly + user record) without resolving a URL |
 | `GET` | `/prc-api/v3/datasets/download-stats` | `edit_posts` capability | Returns `{ total, log: { year: { month: count } } }` for a dataset; cached 24 h via transient |
 
 The `dataset` post type also gets a `_downloads` REST field that exposes the same total + yearly log structure on the standard WP REST response.

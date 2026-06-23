@@ -9,9 +9,6 @@
   "attributes": {
     "datasetId": {
       "type": "string"
-    },
-    "nonce": {
-      "type": "string"
     }
   },
   "supports": {

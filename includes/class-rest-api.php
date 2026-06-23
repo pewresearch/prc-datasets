@@ -41,6 +41,41 @@ class Rest_API {
 	}
 
 	/**
+	 * Enforce per-IP rate limiting for dataset download endpoints.
+	 *
+	 * @param string $endpoint_key Unique key for this endpoint bucket.
+	 * @return true|WP_Error
+	 */
+	private function enforce_ip_rate_limit( string $endpoint_key ) {
+		if ( ! function_exists( '\\PRC\\Platform\\rate_limit_hit' ) ) {
+			return true;
+		}
+
+		$ip = function_exists( '\\PRC\\Platform\\get_client_ip' )
+			? \PRC\Platform\get_client_ip()
+			: '';
+
+		if ( '' === $ip ) {
+			return true;
+		}
+
+		if ( \PRC\Platform\rate_limit_hit(
+			'datasets_' . $endpoint_key . '_' . md5( $ip ),
+			30,
+			MINUTE_IN_SECONDS,
+			'prc_datasets_throttle'
+		) ) {
+			return new WP_Error(
+				'rate_limited',
+				'Too many requests. Please try again later.',
+				array( 'status' => 429 )
+			);
+		}
+
+		return true;
+	}
+
+	/**
 	 * @hook rest_api_init
 	 */
 	public function register_dataset_endpoints() {
@@ -97,13 +132,7 @@ class Rest_API {
 						'type'     => 'integer',
 					),
 				),
-				'permission_callback' => function ( WP_REST_Request $request ) {
-					$nonce = $request->get_header( 'X-WP-Nonce' );
-					if ( empty( $nonce ) ) {
-						return false;
-					}
-					return true;
-				},
+				'permission_callback' => '__return_true',
 			)
 		);
 		register_rest_route(
@@ -280,17 +309,9 @@ class Rest_API {
 	 * @return WP_REST_Response|WP_Error
 	 */
 	public function restfully_download_dataset( WP_REST_Request $request ) {
-		$data  = json_decode( $request->get_body(), true );
-		$nonce = array_key_exists( 'NONCE', $data ) ? $data['NONCE'] : null;
-		if ( ! wp_verify_nonce( $nonce, 'prc_platform_dataset_download' ) ) {
-			return new WP_Error(
-				'invalid_nonce',
-				'Invalid nonce.',
-				array(
-					'status' => 400,
-					'data'   => $data,
-				)
-			);
+		$throttled = $this->enforce_ip_rate_limit( 'get_download' );
+		if ( is_wp_error( $throttled ) ) {
+			return $throttled;
 		}
 
 		$auth = \PRC\Platform\User_Accounts\extract_user_auth_from_request( $request );
@@ -347,12 +368,6 @@ class Rest_API {
 	 * @return WP_REST_Response|WP_Error
 	 */
 	public function restfully_check_atp_acceptance( WP_REST_Request $request ) {
-		$data  = json_decode( $request->get_body(), true );
-		$nonce = array_key_exists( 'NONCE', $data ) ? $data['NONCE'] : null;
-		if ( ! wp_verify_nonce( $nonce, 'prc_platform_dataset_download' ) ) {
-			return new WP_Error( 'invalid_nonce', 'Invalid nonce.', array( 'status' => 400 ) );
-		}
-
 		$auth = \PRC\Platform\User_Accounts\extract_user_auth_from_request( $request );
 		if ( is_wp_error( $auth ) ) {
 			return $auth;
@@ -371,12 +386,6 @@ class Rest_API {
 	 * @return WP_REST_Response|WP_Error
 	 */
 	public function restfully_accept_atp( WP_REST_Request $request ) {
-		$data  = json_decode( $request->get_body(), true );
-		$nonce = array_key_exists( 'NONCE', $data ) ? $data['NONCE'] : null;
-		if ( ! wp_verify_nonce( $nonce, 'prc_platform_dataset_download' ) ) {
-			return new WP_Error( 'invalid_nonce', 'Invalid nonce.', array( 'status' => 400 ) );
-		}
-
 		$auth = \PRC\Platform\User_Accounts\extract_user_auth_from_request( $request );
 		if ( is_wp_error( $auth ) ) {
 			return $auth;
@@ -438,10 +447,6 @@ class Rest_API {
 	 * @return array|WP_Error
 	 */
 	public function restfully_log_download( WP_REST_Request $request ) {
-		if ( wp_verify_nonce( $request->get_header( 'X-WP-Nonce' ), 'WP_REST' ) === false ) {
-			return new WP_Error( 'invalid_nonce', 'Invalid nonce.', array( 'status' => 403 ) );
-		}
-
 		$auth = \PRC\Platform\User_Accounts\extract_user_auth_from_request( $request );
 		if ( is_wp_error( $auth ) ) {
 			return $auth;

@@ -6,7 +6,7 @@ import { store, getContext, getElement } from '@wordpress/interactivity';
 
 const { state, actions } = store('prc-platform/dataset-download', {
 	actions: {
-		downloadDataset: (datasetId, NONCE, context) => {
+		downloadDataset: (datasetId, context) => {
 			const { getUserHeaders } = store(
 				'prc-user-accounts/content-gate'
 			).actions;
@@ -21,7 +21,6 @@ const { state, actions } = store('prc-platform/dataset-download', {
 					path: `/prc-api/v3/datasets/get-download/?dataset_id=${datasetId}`,
 					method: 'POST',
 					headers,
-					data: { NONCE },
 				})
 				.then((response) => {
 					if (response?.file_url) {
@@ -36,7 +35,7 @@ const { state, actions } = store('prc-platform/dataset-download', {
 					console.error(error);
 				});
 		},
-		async checkATP(datasetId, NONCE) {
+		async checkATP(datasetId) {
 			const { ref } = getElement();
 			const context = getContext();
 			const { getUserHeaders } = store(
@@ -54,11 +53,10 @@ const { state, actions } = store('prc-platform/dataset-download', {
 					path: `/prc-api/v3/datasets/check-atp/`,
 					method: 'POST',
 					headers,
-					data: { NONCE },
 				});
 
 				if (true === response) {
-					actions.downloadDataset(datasetId, NONCE, context);
+					actions.downloadDataset(datasetId, context);
 				}
 				if (false === response) {
 					context.isProcessing = false;
@@ -78,14 +76,14 @@ const { state, actions } = store('prc-platform/dataset-download', {
 		onButtonClick: (event) => {
 			event.preventDefault();
 			const context = getContext();
-			const { datasetId, isATP, NONCE } = context;
+			const { datasetId, isATP } = context;
 
 			context.isProcessing = true;
 
 			if (isATP) {
-				actions.checkATP(datasetId, NONCE);
+				actions.checkATP(datasetId);
 			} else {
-				actions.downloadDataset(datasetId, NONCE, context);
+				actions.downloadDataset(datasetId, context);
 			}
 		},
 	},

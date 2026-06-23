@@ -47,7 +47,7 @@ const { actions } = store('prc-platform/dataset-download', {
 		},
 		*accept() {
 			const context = getContext();
-			const { datasetId, NONCE } = context;
+			const { datasetId } = context;
 
 			const { getUserHeaders } = store(
 				'prc-user-accounts/content-gate'
@@ -60,10 +60,9 @@ const { actions } = store('prc-platform/dataset-download', {
 				path: `/prc-api/v3/datasets/accept-atp`,
 				method: 'POST',
 				headers,
-				data: { NONCE },
 			})
 				.then(() => {
-					actions.downloadDataset(datasetId, NONCE, context);
+					actions.downloadDataset(datasetId, context);
 					actions.closeDialogs();
 				})
 				.catch(() => {
