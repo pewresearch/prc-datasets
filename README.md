@@ -6,7 +6,7 @@ Manages the `dataset` post type and `datasets` taxonomy as a linked pair (via [`
 
 - Registers the `dataset` CPT and `datasets` taxonomy and binds them via `prc/term-data-store` so each taxonomy term has a corresponding post that holds the content and metadata.
 - Adds `prc-datasets` post type support to `post`, `feature`, and `chart` so those post types can be tagged with dataset terms.
-- Gated downloads — resolves the download file URL (media library attachment, legacy meta, or legacy archive fallback) only after verifying a nonce and a Firebase UID.
+- Gated downloads — resolves the download file URL (media library attachment, legacy meta, or legacy archive fallback) only after verifying Firebase identity (`X-PRC-User-Id` / `X-PRC-User-Token` headers) and per-IP rate limiting on `get-download`. Page-baked WordPress nonces are not used (they expire on edge-cached pages).
 - ATP (American Trends Panel) legal gate — marks individual datasets as ATP-restricted; users must accept the ATP Terms of Service before a download URL is returned.
 - Download telemetry — tracks a cumulative total (`_total_downloads`) and a per-year monthly breakdown (`_downloads_{year}`) stored as post meta; also logs each download against the Firebase user record.
 - Newsletter audiences — `wp prc datasets build-audience` calls the `buildDatasetAudience` Cloud Function to resolve downloader emails for system-email newsletters.
@@ -36,7 +36,7 @@ Manages the `dataset` post type and `datasets` taxonomy as a linked pair (via [`
 
 | Block name | Description |
 |---|---|
-| `prc-platform/dataset-download` | Renders the download button. Uses the Interactivity API for the client-side download flow (nonce verification, ATP gate check, file URL resolution). Dynamic (`render.php`). |
+| `prc-platform/dataset-download` | Renders the download button. Uses the Interactivity API for the client-side download flow (Firebase auth headers, ATP gate check, file URL resolution). Dynamic (`render.php`). |
 | `prc-platform/dataset-atp-legal-acceptance` | Renders the ATP terms acceptance form. Injected automatically by the download block when a dataset is ATP-restricted and the user has not yet accepted. Not directly insertable. |
 | `prc-platform/dataset-description` | Editor-only. Registers a block bindings source (`prc-platform/dataset-description`) that pulls `post_content` from the related `dataset` post into a `core/paragraph` block on taxonomy archive or single-dataset pages. |
 
@@ -53,6 +53,17 @@ All endpoints are registered under `prc-api/v3` on `rest_api_init`.
 | `GET` | `/prc-api/v3/datasets/download-stats` | `edit_posts` capability | Returns `{ total, log: { year: { month: count } } }` for a dataset; cached 24 h via transient |
 
 The `dataset` post type also gets a `_downloads` REST field that exposes the same total + yearly log structure on the standard WP REST response.
+
+### Authenticated download requests
+
+User-facing endpoints (`get-download`, `check-atp`, `accept-atp`, `log-download`) require Firebase identity via request headers (not query args or page nonces):
+
+| Header | Description |
+|---|---|
+| `X-PRC-User-Id` | Firebase UID of the signed-in user |
+| `X-PRC-User-Token` | Firebase ID token; validated server-side before any user-scoped action |
+
+`get-download` additionally enforces per-IP rate limiting via `PRC\Platform\rate_limit_hit()`.
 
 ## Filters and hooks
 

@@ -83,6 +83,7 @@ class Plugin {
 
 		$this->load_dependencies();
 		$this->set_locale();
+		$this->define_patterns();
 		$this->init_dependencies();
 	}
 
@@ -155,6 +156,33 @@ class Plugin {
 	private function set_locale() {
 		$plugin_i18n = new I18n();
 		$this->loader->add_action( 'plugins_loaded', $plugin_i18n, 'load_plugin_textdomain' );
+	}
+
+	/**
+	 * Register block patterns from the plugin patterns directory.
+	 */
+	private function define_patterns() {
+		$this->loader->add_action( 'plugins_loaded', $this, 'register_patterns', 5 );
+	}
+
+	/**
+	 * Load binding companion patterns via the platform pattern loader.
+	 *
+	 * @hook plugins_loaded
+	 */
+	public function register_patterns(): void {
+		if ( ! function_exists( '\PRC\Platform\Core\Patterns\register_plugin_patterns' ) ) {
+			return;
+		}
+
+		\PRC\Platform\Core\Patterns\register_plugin_patterns(
+			'prc-datasets',
+			plugin_dir_path( __DIR__ ) . 'patterns',
+			array(
+				'category_label' => __( 'Datasets', 'prc-datasets' ),
+				'text_domain'    => 'prc-datasets',
+			)
+		);
 	}
 
 	/**

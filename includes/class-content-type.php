@@ -397,7 +397,8 @@ class Content_Type {
 	public function include_datasets_in_search( $query_args, $query ) {
 		// Add datasets post type to search results if the
 		// search query if the user is searching.
-		if ( strlen( $query_args['s'] ?? '' ) > 0 ) {
+		$search_term = $query_args['s'] ?? '';
+		if ( is_string( $search_term ) && strlen( $search_term ) > 0 ) {
 			$query_args['post_type'] = array_merge( $query_args['post_type'] ?? array(), array( 'dataset' ) );
 		}
 		return $query_args;
