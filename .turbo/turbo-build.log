@@ -1,9 +1,9 @@
 
-> @prc/datasets@1.1.0 build
+> @prc/datasets@1.0.0 build
 > npm run build:blocks && npm run build:inspector-panel
 
 
-> @prc/datasets@1.1.0 build:blocks
+> @prc/datasets@1.0.0 build:blocks
 > wp-scripts build --experimental-modules --webpack-copy-php && wp-scripts build-blocks-manifest
 
 assets by path download-block/ 7.45 KiB
@@ -33,7 +33,7 @@ built modules 8.8 KiB (javascript) 1.38 KiB (css/mini-extract) [built]
   cacheable modules 1.38 KiB
     css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]!./src/dataset-atp-legal-acceptance-block/style.scss 318 bytes [built] [code generated]
     css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]!./src/download-block/style.scss 1.06 KiB [built] [code generated]
-webpack 5.106.2 compiled successfully in 3627 ms
+webpack 5.106.2 compiled successfully in 3818 ms
 
 assets by path dataset-atp-legal-acceptance-block/ 8.36 KiB
   asset dataset-atp-legal-acceptance-block/view.js 8.23 KiB [compared for emit] [javascript module] [minimized] (name: dataset-atp-legal-acceptance-block/view)
@@ -46,10 +46,10 @@ Entrypoint download-block/view 1.65 KiB = download-block/view.js 1.52 KiB downlo
 orphan modules 42 bytes [orphan] 1 module
 ./src/dataset-atp-legal-acceptance-block/view.js + 1 modules 8.9 KiB [not cacheable] [built] [code generated]
 ./src/download-block/view.js + 1 modules 3.41 KiB [not cacheable] [built] [code generated]
-webpack 5.106.2 compiled successfully in 2022 ms
+webpack 5.106.2 compiled successfully in 1802 ms
 Block metadata PHP file generated at: build/blocks-manifest.php
 
-> @prc/datasets@1.1.0 build:inspector-panel
+> @prc/datasets@1.0.0 build:inspector-panel
 > wp-scripts build --source-path=includes/inspector-sidebar-panel/src --output-path=includes/inspector-sidebar-panel/build
 
 assets by path *.css 3.17 KiB
@@ -63,4 +63,4 @@ runtime modules 663 bytes 3 modules
 built modules 9.14 KiB (javascript) 1.58 KiB (css/mini-extract) [built]
   ./includes/inspector-sidebar-panel/src/index.js + 16 modules 9.14 KiB [not cacheable] [built] [code generated]
   css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]!./includes/inspector-sidebar-panel/src/stats-panel.scss 1.58 KiB [built] [code generated]
-webpack 5.106.2 compiled successfully in 4793 ms
+webpack 5.106.2 compiled successfully in 3385 ms
