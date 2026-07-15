@@ -23,6 +23,7 @@ Manages the `dataset` post type and `datasets` taxonomy as a linked pair (via [`
 |---|---|
 | `includes/class-content-type.php` | CPT/taxonomy registration, `prc/term-data-store` relationship, meta field registration, rewrite rules, research team URL config, search/FacetWP inclusion |
 | `includes/class-rest-api.php` | REST endpoint registration and all download/ATP/logging handlers |
+| `includes/class-ability.php` | WP Abilities API `prc-datasets/get-analytics` and `prc-datasets/get-download-url` tools (MCP + REST) |
 | `includes/class-cli.php` | WP-CLI commands under `wp prc datasets` |
 | `includes/class-cli-build-audience.php` | `wp prc datasets build-audience` — Firebase audience resolver |
 | `includes/class-plugin.php` | Bootstrap: loads classes, registers blocks, wires block bindings source, enqueues inspector panel |
@@ -53,6 +54,13 @@ All endpoints are registered under `prc-api/v3` on `rest_api_init`.
 | `GET` | `/prc-api/v3/datasets/download-stats` | `edit_posts` capability | Returns `{ total, log: { year: { month: count } } }` for a dataset; cached 24 h via transient |
 
 The `dataset` post type also gets a `_downloads` REST field that exposes the same total + yearly log structure on the standard WP REST response.
+
+## WP Abilities API
+
+| Ability ID | Input | Description |
+|---|---|---|
+| `prc-datasets/get-analytics` | `post_id` (integer, required) | Returns `{ post_id, title, total, log }` download analytics for a dataset. Requires `edit_post` on that dataset. Exposed via REST and MCP. |
+| `prc-datasets/get-download-url` | `post_id` (integer, required) | Returns `{ post_id, title, file_url, attachment_id }` without incrementing download counters. Requires Author+ (`publish_posts`) and `edit_post` on the dataset. Does not attempt legacy archive recovery. |
 
 ### Authenticated download requests
 
@@ -89,6 +97,8 @@ User-facing endpoints (`get-download`, `check-atp`, `accept-atp`, `log-download`
 | `prc_platform_pub_listing_default_args` | Filter | prc-pub-listing | Adds `dataset` to `post_type` when a search string is present |
 | `prc_platform__facetwp_indexer_query_args` | Filter | prc-facets | Adds `dataset` to the FacetWP indexer query so datasets are facetable |
 | `rest_api_init` | Action | WordPress core | Registers the five dataset REST endpoints directly |
+| `wp_abilities_api_init` | Action | WP Abilities API | Registers `prc-datasets/get-analytics` and `prc-datasets/get-download-url` |
+
 ## Post meta
 
 | Key | Type | Description |

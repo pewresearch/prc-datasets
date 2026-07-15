@@ -303,6 +303,43 @@ class Rest_API {
 	}
 
 	/**
+	 * Resolve the download file URL for a dataset without logging or side effects.
+	 *
+	 * Looks up the media library attachment, then the legacy dataset_download_url meta.
+	 * Does not attempt legacy archive recovery (that path enqueues migration jobs).
+	 *
+	 * @param int $dataset_id Dataset post ID.
+	 * @return array{file_url: string, attachment_id: int|null}|WP_Error
+	 */
+	public static function resolve_download_file_url( int $dataset_id ) {
+		$attachment_id = get_post_meta( $dataset_id, Content_Type::$download_meta_key, true );
+		$attachment_id = $attachment_id ? (int) $attachment_id : null;
+		$file_url      = null;
+
+		if ( $attachment_id ) {
+			$file_url = wp_get_attachment_url( $attachment_id );
+		}
+
+		if ( empty( $file_url ) ) {
+			$attachment_id = null;
+			$file_url      = get_post_meta( $dataset_id, 'dataset_download_url', true );
+		}
+
+		if ( empty( $file_url ) || ! is_string( $file_url ) ) {
+			return new WP_Error(
+				'datasets/failed-to-get-file-url',
+				'Failed to get the file url for the dataset.',
+				array( 'status' => 404 )
+			);
+		}
+
+		return array(
+			'file_url'      => $file_url,
+			'attachment_id' => $attachment_id,
+		);
+	}
+
+	/**
 	 * Restfully download a dataset.
 	 *
 	 * @param WP_REST_Request $request The request.
@@ -325,40 +362,27 @@ class Rest_API {
 		if ( ! $id ) {
 			return new WP_Error( 'no_id', 'No dataset ID provided.', array( 'status' => 400 ) );
 		}
-		$file_url      = null;
-		$attachment_id = get_post_meta( $id, Content_Type::$download_meta_key, true );
-		if ( $attachment_id ) {
-			$file_url = wp_get_attachment_url( $attachment_id );
-		}
-		if ( ! $file_url || empty( $file_url ) ) {
-			// If ultimately we can not get an attachment url, we should check the archive.
-			$file_url = get_post_meta( $id, 'dataset_download_url', true );
-			if ( ! $file_url || empty( $file_url ) ) {
-				$file_url = $this->attempt_download_from_archive( $id );
-			} else {
-				$file_url = new WP_Error(
-					'datasets/failed-to-get-file-url',
-					'Failed to get the file url for the dataset.',
-					array( 'status' => 500 )
-				);
+
+		$resolved = self::resolve_download_file_url( (int) $id );
+		if ( is_wp_error( $resolved ) ) {
+			// Fall back to legacy archive recovery for the public download path.
+			$file_url = $this->attempt_download_from_archive( $id );
+			if ( is_wp_error( $file_url ) ) {
+				return rest_ensure_response( $file_url );
 			}
+		} else {
+			$file_url = $resolved['file_url'];
 		}
 
-		if ( is_wp_error( $file_url ) ) {
-			return rest_ensure_response(
-				$file_url
-			);
-		} else {
-			// Log the download.
-			$this->increment_download_total( $id );
-			$this->log_monthly_download_count( $id );
-			$this->log_dataset_to_user( $uid, $id, $token );
-			return rest_ensure_response(
-				array(
-					'file_url' => $file_url,
-				)
-			);
-		}
+		// Log the download.
+		$this->increment_download_total( $id );
+		$this->log_monthly_download_count( $id );
+		$this->log_dataset_to_user( $uid, $id, $token );
+		return rest_ensure_response(
+			array(
+				'file_url' => $file_url,
+			)
+		);
 	}
 
 	/**
@@ -466,22 +490,18 @@ class Rest_API {
 	}
 
 	/**
-	 * Restfully get the download stats for a dataset.
+	 * Get download stats for a dataset (total + yearly/monthly log).
 	 *
-	 * @param WP_REST_Request $request The request.
-	 * @return array|WP_Error
+	 * Results are cached in a transient for 24 hours.
+	 *
+	 * @param int $dataset_id Dataset post ID.
+	 * @return array{total: int, log: array<int, mixed>}
 	 */
-	public function restfully_get_download_stats( WP_REST_Request $request ) {
-
-		$dataset_id = $request->get_param( 'dataset_id' );
-		if ( ! $dataset_id ) {
-			return new WP_Error( 'no_dataset_id', 'No dataset ID provided.', array( 'status' => 400 ) );
-		}
-
+	public static function get_download_stats( int $dataset_id ): array {
 		$cache_key   = 'dataset_downloads_' . $dataset_id;
 		$cached_data = get_transient( $cache_key );
 
-		if ( false !== $cached_data ) {
+		if ( false !== $cached_data && is_array( $cached_data ) ) {
 			return $cached_data;
 		}
 
@@ -502,6 +522,22 @@ class Rest_API {
 		set_transient( $cache_key, $to_return, DAY_IN_SECONDS );
 
 		return $to_return;
+	}
+
+	/**
+	 * Restfully get the download stats for a dataset.
+	 *
+	 * @param WP_REST_Request $request The request.
+	 * @return array|WP_Error
+	 */
+	public function restfully_get_download_stats( WP_REST_Request $request ) {
+
+		$dataset_id = $request->get_param( 'dataset_id' );
+		if ( ! $dataset_id ) {
+			return new WP_Error( 'no_dataset_id', 'No dataset ID provided.', array( 'status' => 400 ) );
+		}
+
+		return self::get_download_stats( (int) $dataset_id );
 	}
 	/**
 	 * Increment the total download count for a dataset.

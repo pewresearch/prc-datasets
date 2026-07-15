@@ -127,6 +127,11 @@ class Plugin {
 		require_once plugin_dir_path( __DIR__ ) . 'includes/class-rest-api.php';
 
 		/**
+		 * The class responsible for the WP Abilities API analytics ability.
+		 */
+		require_once plugin_dir_path( __DIR__ ) . 'includes/class-ability.php';
+
+		/**
 		 * The class responsible for the dataset list table admin filter.
 		 */
 		require_once plugin_dir_path( __DIR__ ) . 'includes/class-admin-filter.php';
@@ -160,15 +165,19 @@ class Plugin {
 
 	/**
 	 * Register block patterns from the plugin patterns directory.
+	 *
+	 * Queues on init priority 8 so translated category labels run after WP 6.7+
+	 * allows just-in-time textdomain loading, and before the platform pattern
+	 * loader registers categories (init/9) and pattern files (init/10).
 	 */
 	private function define_patterns() {
-		$this->loader->add_action( 'plugins_loaded', $this, 'register_patterns', 5 );
+		$this->loader->add_action( 'init', $this, 'register_patterns', 8 );
 	}
 
 	/**
 	 * Load binding companion patterns via the platform pattern loader.
 	 *
-	 * @hook plugins_loaded
+	 * @hook init 8
 	 */
 	public function register_patterns(): void {
 		if ( ! function_exists( '\PRC\Platform\Core\Patterns\register_plugin_patterns' ) ) {
@@ -195,6 +204,7 @@ class Plugin {
 	private function init_dependencies() {
 		new Content_Type( $this->get_loader() );
 		new Rest_API( $this->get_loader() );
+		new Ability( $this->get_loader() );
 		new Admin_Filter( $this->get_loader() );
 
 		if ( class_exists( 'PRC\Platform\Markdown_For_Agents\LLMs_Txt' ) ) {
