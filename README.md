@@ -23,6 +23,7 @@ Manages the `dataset` post type and `datasets` taxonomy as a linked pair (via [`
 |---|---|
 | `includes/class-content-type.php` | CPT/taxonomy registration, `prc/term-data-store` relationship, meta field registration, rewrite rules, research team URL config, search/FacetWP inclusion |
 | `includes/class-rest-api.php` | REST endpoint registration and all download/ATP/logging handlers |
+| `includes/class-ability-categories.php` | Registers the `datasets` WP Abilities category for MCP discovery |
 | `includes/class-ability.php` | WP Abilities API `prc-datasets/get-analytics` and `prc-datasets/get-download-url` tools (MCP + REST) |
 | `includes/class-cli.php` | WP-CLI commands under `wp prc datasets` |
 | `includes/class-cli-build-audience.php` | `wp prc datasets build-audience` — Firebase audience resolver |
@@ -97,6 +98,7 @@ User-facing endpoints (`get-download`, `check-atp`, `accept-atp`, `log-download`
 | `prc_platform_pub_listing_default_args` | Filter | prc-pub-listing | Adds `dataset` to `post_type` when a search string is present |
 | `prc_platform__facetwp_indexer_query_args` | Filter | prc-facets | Adds `dataset` to the FacetWP indexer query so datasets are facetable |
 | `rest_api_init` | Action | WordPress core | Registers the five dataset REST endpoints directly |
+| `wp_abilities_api_categories_init` | Action | WP Abilities API | Registers the `datasets` ability category |
 | `wp_abilities_api_init` | Action | WP Abilities API | Registers `prc-datasets/get-analytics` and `prc-datasets/get-download-url` |
 
 ## Post meta

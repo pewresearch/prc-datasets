@@ -60,7 +60,7 @@ class Ability {
 			array(
 				'label'               => __( 'Get dataset download analytics', 'prc-datasets' ),
 				'description'         => __( 'Returns download analytics for a dataset post ID: all-time total and yearly/monthly download counts.', 'prc-datasets' ),
-				'category'            => 'data-analysis',
+				'category'            => Ability_Categories::CATEGORY,
 				'input_schema'        => array(
 					'type'                 => 'object',
 					'required'             => array( 'post_id' ),
@@ -89,9 +89,8 @@ class Ability {
 							'description' => 'All-time download count.',
 						),
 						'log'     => array(
-							'type'                 => 'object',
-							'description'          => 'Yearly download log keyed by year, each value an object of month => count.',
-							'additionalProperties' => true,
+							'type'        => 'object',
+							'description' => 'Yearly download log keyed by year, each value an object of month => count.',
 						),
 					),
 				),
@@ -123,7 +122,7 @@ class Ability {
 			array(
 				'label'               => __( 'Get dataset download file URL', 'prc-datasets' ),
 				'description'         => __( 'Returns the downloadable file URL for a dataset post ID (media attachment or legacy stored URL). Does not increment download counters. Requires Author-level access and edit permission on the dataset.', 'prc-datasets' ),
-				'category'            => 'data-retrieval',
+				'category'            => Ability_Categories::CATEGORY,
 				'input_schema'        => array(
 					'type'                 => 'object',
 					'required'             => array( 'post_id' ),
@@ -152,8 +151,8 @@ class Ability {
 							'description' => 'Direct download URL for the dataset file.',
 						),
 						'attachment_id' => array(
-							'type'        => array( 'integer', 'null' ),
-							'description' => 'Media library attachment ID when the file is attached; null for legacy URL-only datasets.',
+							'type'        => 'integer',
+							'description' => 'Media library attachment ID when the file is attached; omit or 0 for legacy URL-only datasets.',
 						),
 					),
 				),
@@ -295,7 +294,7 @@ class Ability {
 			'post_id'       => $post_id,
 			'title'         => get_the_title( $post ),
 			'file_url'      => $resolved['file_url'],
-			'attachment_id' => $resolved['attachment_id'],
+			'attachment_id' => null !== $resolved['attachment_id'] ? (int) $resolved['attachment_id'] : 0,
 		);
 	}
 }

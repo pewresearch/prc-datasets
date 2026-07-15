@@ -129,6 +129,7 @@ class Plugin {
 		/**
 		 * The class responsible for the WP Abilities API analytics ability.
 		 */
+		require_once plugin_dir_path( __DIR__ ) . 'includes/class-ability-categories.php';
 		require_once plugin_dir_path( __DIR__ ) . 'includes/class-ability.php';
 
 		/**
@@ -204,6 +205,7 @@ class Plugin {
 	private function init_dependencies() {
 		new Content_Type( $this->get_loader() );
 		new Rest_API( $this->get_loader() );
+		new Ability_Categories( $this->get_loader() );
 		new Ability( $this->get_loader() );
 		new Admin_Filter( $this->get_loader() );
 
