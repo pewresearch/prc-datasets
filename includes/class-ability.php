@@ -15,6 +15,13 @@ use WP_Error;
 class Ability {
 
 	/**
+	 * Plugin file used to validate activation on the target site.
+	 *
+	 * @var string
+	 */
+	private const PLUGIN_FILE = 'prc-datasets/prc-datasets.php';
+
+	/**
 	 * Analytics ability name.
 	 *
 	 * @var string
@@ -71,6 +78,7 @@ class Ability {
 							'description' => 'Dataset post ID.',
 							'minimum'     => 1,
 						),
+						'site_id' => \PRC\Platform\AI\Utils\site_id_input_schema_property(),
 					),
 				),
 				'output_schema'       => array(
@@ -98,7 +106,7 @@ class Ability {
 				'permission_callback' => array( $this, 'can_get_analytics' ),
 				'meta'                => array(
 					'annotations'  => array(
-						'instructions' => 'Pass a dataset post_id to retrieve download totals and the yearly/monthly download log. Use vip/content-search with subtype=dataset to find dataset IDs first. Requires edit access to the dataset.',
+						'instructions' => 'Pass a dataset post_id to retrieve download totals and the yearly/monthly download log. Optionally pass site_id to run against a specific multisite blog; defaults to the content site (20). If this plugin is inactive on the target site, the ability returns plugin_inactive_on_site. Use vip/content-search with subtype=dataset to find dataset IDs first. Requires edit access to the dataset.',
 						'readonly'     => true,
 						'destructive'  => false,
 						'idempotent'   => true,
@@ -133,6 +141,7 @@ class Ability {
 							'description' => 'Dataset post ID.',
 							'minimum'     => 1,
 						),
+						'site_id' => \PRC\Platform\AI\Utils\site_id_input_schema_property(),
 					),
 				),
 				'output_schema'       => array(
@@ -160,7 +169,7 @@ class Ability {
 				'permission_callback' => array( $this, 'can_get_download_url' ),
 				'meta'                => array(
 					'annotations'  => array(
-						'instructions' => 'Pass a dataset post_id to retrieve the downloadable file URL without logging a download. Requires Author role or higher (publish_posts) and edit_post on the dataset. Does not attempt legacy archive recovery.',
+						'instructions' => 'Pass a dataset post_id to retrieve the downloadable file URL without logging a download. Optionally pass site_id to run against a specific multisite blog; defaults to the content site (20). If this plugin is inactive on the target site, the ability returns plugin_inactive_on_site. Requires Author role or higher (publish_posts) and edit_post on the dataset. Does not attempt legacy archive recovery.',
 						'readonly'     => true,
 						'destructive'  => false,
 						'idempotent'   => true,
@@ -179,34 +188,44 @@ class Ability {
 	 * Permission check for analytics ability.
 	 *
 	 * @param array|null $input Ability input.
-	 * @return bool
+	 * @return bool|WP_Error
 	 */
-	public function can_get_analytics( $input = null ): bool {
-		if ( ! is_array( $input ) || empty( $input['post_id'] ) ) {
-			return current_user_can( 'edit_posts' );
-		}
+	public function can_get_analytics( $input = null ) {
+		return $this->with_site(
+			$input,
+			function () use ( $input ) {
+				if ( ! is_array( $input ) || empty( $input['post_id'] ) ) {
+					return current_user_can( 'edit_posts' );
+				}
 
-		$post_id = absint( $input['post_id'] );
-		return $post_id > 0 && current_user_can( 'edit_post', $post_id );
+				$post_id = absint( $input['post_id'] );
+				return $post_id > 0 && current_user_can( 'edit_post', $post_id );
+			}
+		);
 	}
 
 	/**
 	 * Permission check for download URL ability (Author+ and edit_post).
 	 *
 	 * @param array|null $input Ability input.
-	 * @return bool
+	 * @return bool|WP_Error
 	 */
-	public function can_get_download_url( $input = null ): bool {
-		if ( ! current_user_can( 'publish_posts' ) ) {
-			return false;
-		}
+	public function can_get_download_url( $input = null ) {
+		return $this->with_site(
+			$input,
+			function () use ( $input ) {
+				if ( ! current_user_can( 'publish_posts' ) ) {
+					return false;
+				}
 
-		if ( ! is_array( $input ) || empty( $input['post_id'] ) ) {
-			return true;
-		}
+				if ( ! is_array( $input ) || empty( $input['post_id'] ) ) {
+					return true;
+				}
 
-		$post_id = absint( $input['post_id'] );
-		return $post_id > 0 && current_user_can( 'edit_post', $post_id );
+				$post_id = absint( $input['post_id'] );
+				return $post_id > 0 && current_user_can( 'edit_post', $post_id );
+			}
+		);
 	}
 
 	/**
@@ -216,39 +235,44 @@ class Ability {
 	 * @return array|WP_Error
 	 */
 	public function execute( $input ) {
-		$post_id = isset( $input['post_id'] ) ? absint( $input['post_id'] ) : 0;
-		if ( $post_id < 1 ) {
-			return new WP_Error(
-				'missing_post_id',
-				__( 'post_id is required.', 'prc-datasets' ),
-				array( 'status' => 400 )
-			);
-		}
+		return $this->with_site(
+			$input,
+			function () use ( $input ) {
+				$post_id = isset( $input['post_id'] ) ? absint( $input['post_id'] ) : 0;
+				if ( $post_id < 1 ) {
+					return new WP_Error(
+						'missing_post_id',
+						__( 'post_id is required.', 'prc-datasets' ),
+						array( 'status' => 400 )
+					);
+				}
 
-		$post = get_post( $post_id );
-		if ( ! $post || 'dataset' !== $post->post_type ) {
-			return new WP_Error(
-				'invalid_dataset',
-				__( 'Post not found or is not a dataset.', 'prc-datasets' ),
-				array( 'status' => 404 )
-			);
-		}
+				$post = get_post( $post_id );
+				if ( ! $post || 'dataset' !== $post->post_type ) {
+					return new WP_Error(
+						'invalid_dataset',
+						__( 'Post not found or is not a dataset.', 'prc-datasets' ),
+						array( 'status' => 404 )
+					);
+				}
 
-		if ( ! current_user_can( 'edit_post', $post_id ) ) {
-			return new WP_Error(
-				'rest_forbidden',
-				__( 'You are not allowed to view analytics for this dataset.', 'prc-datasets' ),
-				array( 'status' => 403 )
-			);
-		}
+				if ( ! current_user_can( 'edit_post', $post_id ) ) {
+					return new WP_Error(
+						'rest_forbidden',
+						__( 'You are not allowed to view analytics for this dataset.', 'prc-datasets' ),
+						array( 'status' => 403 )
+					);
+				}
 
-		$stats = Rest_API::get_download_stats( $post_id );
+				$stats = Rest_API::get_download_stats( $post_id );
 
-		return array(
-			'post_id' => $post_id,
-			'title'   => get_the_title( $post ),
-			'total'   => (int) ( $stats['total'] ?? 0 ),
-			'log'     => is_array( $stats['log'] ?? null ) ? $stats['log'] : array(),
+				return array(
+					'post_id' => $post_id,
+					'title'   => get_the_title( $post ),
+					'total'   => (int) ( $stats['total'] ?? 0 ),
+					'log'     => is_array( $stats['log'] ?? null ) ? $stats['log'] : array(),
+				);
+			}
 		);
 	}
 
@@ -259,42 +283,62 @@ class Ability {
 	 * @return array|WP_Error
 	 */
 	public function execute_get_download_url( $input ) {
-		$post_id = isset( $input['post_id'] ) ? absint( $input['post_id'] ) : 0;
-		if ( $post_id < 1 ) {
-			return new WP_Error(
-				'missing_post_id',
-				__( 'post_id is required.', 'prc-datasets' ),
-				array( 'status' => 400 )
-			);
-		}
+		return $this->with_site(
+			$input,
+			function () use ( $input ) {
+				$post_id = isset( $input['post_id'] ) ? absint( $input['post_id'] ) : 0;
+				if ( $post_id < 1 ) {
+					return new WP_Error(
+						'missing_post_id',
+						__( 'post_id is required.', 'prc-datasets' ),
+						array( 'status' => 400 )
+					);
+				}
 
-		$post = get_post( $post_id );
-		if ( ! $post || 'dataset' !== $post->post_type ) {
-			return new WP_Error(
-				'invalid_dataset',
-				__( 'Post not found or is not a dataset.', 'prc-datasets' ),
-				array( 'status' => 404 )
-			);
-		}
+				$post = get_post( $post_id );
+				if ( ! $post || 'dataset' !== $post->post_type ) {
+					return new WP_Error(
+						'invalid_dataset',
+						__( 'Post not found or is not a dataset.', 'prc-datasets' ),
+						array( 'status' => 404 )
+					);
+				}
 
-		if ( ! current_user_can( 'publish_posts' ) || ! current_user_can( 'edit_post', $post_id ) ) {
-			return new WP_Error(
-				'rest_forbidden',
-				__( 'You are not allowed to get the download URL for this dataset.', 'prc-datasets' ),
-				array( 'status' => 403 )
-			);
-		}
+				if ( ! current_user_can( 'publish_posts' ) || ! current_user_can( 'edit_post', $post_id ) ) {
+					return new WP_Error(
+						'rest_forbidden',
+						__( 'You are not allowed to get the download URL for this dataset.', 'prc-datasets' ),
+						array( 'status' => 403 )
+					);
+				}
 
-		$resolved = Rest_API::resolve_download_file_url( $post_id );
-		if ( is_wp_error( $resolved ) ) {
-			return $resolved;
-		}
+				$resolved = Rest_API::resolve_download_file_url( $post_id );
+				if ( is_wp_error( $resolved ) ) {
+					return $resolved;
+				}
 
-		return array(
-			'post_id'       => $post_id,
-			'title'         => get_the_title( $post ),
-			'file_url'      => $resolved['file_url'],
-			'attachment_id' => null !== $resolved['attachment_id'] ? (int) $resolved['attachment_id'] : 0,
+				return array(
+					'post_id'       => $post_id,
+					'title'         => get_the_title( $post ),
+					'file_url'      => $resolved['file_url'],
+					'attachment_id' => null !== $resolved['attachment_id'] ? (int) $resolved['attachment_id'] : 0,
+				);
+			}
+		);
+	}
+
+	/**
+	 * Run a callback on the requested target site.
+	 *
+	 * @param array|null $input    Ability input.
+	 * @param callable   $callback Callback to run after site validation/switching.
+	 * @return mixed
+	 */
+	private function with_site( $input, callable $callback ) {
+		return \PRC\Platform\AI\Utils\with_site(
+			\PRC\Platform\AI\Utils\resolve_site_id( is_array( $input ) ? $input : null ),
+			self::PLUGIN_FILE,
+			$callback
 		);
 	}
 }
