@@ -12,7 +12,7 @@ Manages the `dataset` post type and `datasets` taxonomy as a linked pair (via [`
 - Newsletter audiences — `wp prc datasets build-audience` calls the `buildDatasetAudience` Cloud Function to resolve downloader emails for system-email newsletters.
 - Legacy archive fallback — if a dataset has no attachment ID, attempts to fetch the file URL from `legacy.pewresearch.org` via the REST API and enqueues an Action Scheduler job (`prc_dataset_recovery`) to migrate the file to the current site asynchronously.
 - Custom rewrite rules for `/datasets/`, `/datasets/{year}/`, and research-team-prefixed URLs like `/politics/dataset/{slug}/`.
-- Includes datasets in sitewide search results and FacetWP indexing.
+- Includes datasets in sitewide search results and ElasticPress-backed archive faceting.
 - Injects dataset terms into `prc_platform_post_report_package_materials` so datasets appear in report package sidebars.
 - Block editor sidebar panel (`Dataset Options`) for uploading the download file and toggling the ATP flag, with a monthly download heatmap.
 - Three Gutenberg blocks and one block bindings source (see below).
@@ -21,7 +21,7 @@ Manages the `dataset` post type and `datasets` taxonomy as a linked pair (via [`
 
 | File | Purpose |
 |---|---|
-| `includes/class-content-type.php` | CPT/taxonomy registration, `prc/term-data-store` relationship, meta field registration, rewrite rules, research team URL config, search/FacetWP inclusion |
+| `includes/class-content-type.php` | CPT/taxonomy registration, `prc/term-data-store` relationship, meta field registration, rewrite rules, research team URL config, search/EP archive inclusion |
 | `includes/class-rest-api.php` | REST endpoint registration and all download/ATP/logging handlers |
 | `includes/class-ability-categories.php` | Registers the `datasets` WP Abilities category for MCP discovery |
 | `includes/class-ability.php` | WP Abilities API `prc-datasets/get-analytics` and `prc-datasets/get-download-url` tools (MCP + REST) |
@@ -96,7 +96,6 @@ User-facing endpoints (`get-download`, `check-atp`, `accept-atp`, `log-download`
 | `prc_research_teams_rewrite_config` | Filter | prc-research-teams | Registers research-team-prefixed URL patterns for `dataset` |
 | `prc_platform_post_report_package_materials` | Filter | prc-platform-core | Appends dataset terms to the report package materials array |
 | `prc_platform_pub_listing_default_args` | Filter | prc-pub-listing | Adds `dataset` to `post_type` when a search string is present |
-| `prc_platform__facetwp_indexer_query_args` | Filter | prc-facets | Adds `dataset` to the FacetWP indexer query so datasets are facetable |
 | `rest_api_init` | Action | WordPress core | Registers the five dataset REST endpoints directly |
 | `wp_abilities_api_categories_init` | Action | WP Abilities API | Registers the `datasets` ability category |
 | `wp_abilities_api_init` | Action | WP Abilities API | Registers `prc-datasets/get-analytics` and `prc-datasets/get-download-url` |
@@ -136,7 +135,7 @@ wp prc datasets missing-files [--dry-run]
 | `@prc/components` | `MediaDropZone` used in the editor sidebar panel |
 | [`prc/term-data-store`](https://github.com/pewresearch/term-data-store) (`PRC\TDS`) | `\PRC\TDS\add_relationship()` links the `dataset` CPT and `datasets` taxonomy |
 | Action Scheduler | Async `prc_dataset_recovery` jobs for legacy file migration |
-| FacetWP | Indexer integration (optional; gracefully skipped if not active) |
+| ElasticPress / VIP Search | Dataset archive EP opt-in via `integrate_dataset_archive_with_elasticpress` |
 
 ## Notes
 

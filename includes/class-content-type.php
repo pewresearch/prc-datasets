@@ -185,8 +185,6 @@ class Content_Type {
 		$this->loader->add_action( 'admin_bar_menu', $this, 'modify_admin_bar_edit_link', 100 );
 		$this->loader->add_filter( 'prc_platform_post_report_package_materials', $this, 'get_datasets_for_report_materials', 10, 2 );
 		$this->loader->add_filter( 'prc_platform_pub_listing_default_args', $this, 'include_datasets_in_search', 10, 2 );
-		// Soft-cutover: keep FacetWP indexer hook while FacetWP remains installed.
-		$this->loader->add_filter( 'prc_platform__facetwp_indexer_query_args', $this, 'include_datasets_in_facetwp_indexer_query_args', 10, 1 );
 		$this->loader->add_action( 'pre_get_posts', $this, 'integrate_dataset_archive_with_elasticpress', 5, 1 );
 	}
 
@@ -486,18 +484,4 @@ class Content_Type {
 		return $query_args;
 	}
 
-	/**
-	 * Include datasets in FacetWP indexer query args.
-	 *
-	 * This is an odd one. We do want to index datasets for faceting but we don't want them in the main query.
-	 *
-	 * @hook prc_platform__facetwp_indexer_query_args
-	 *
-	 * @param array $query_args The query args.
-	 * @return array The modified query args.
-	 */
-	public function include_datasets_in_facetwp_indexer_query_args( $query_args ) {
-		$query_args['post_type'] = array_merge( $query_args['post_type'] ?? array(), array( 'dataset' ) );
-		return $query_args;
-	}
 }
