@@ -267,10 +267,13 @@ class Ability {
 				$stats = Rest_API::get_download_stats( $post_id );
 
 				return array(
-					'post_id' => $post_id,
-					'title'   => get_the_title( $post ),
-					'total'   => (int) ( $stats['total'] ?? 0 ),
-					'log'     => is_array( $stats['log'] ?? null ) ? $stats['log'] : array(),
+					'post_id'             => $post_id,
+					'title'               => get_the_title( $post ),
+					'total'               => (int) ( $stats['total'] ?? 0 ),
+					'log'                 => is_array( $stats['log'] ?? null ) ? $stats['log'] : array(),
+					'daily'               => is_array( $stats['daily'] ?? null ) ? $stats['daily'] : array(),
+					'new_data_uploaded'   => $stats['new_data_uploaded'] ?? null,
+					'splits'              => is_array( $stats['splits'] ?? null ) ? $stats['splits'] : array(),
 				);
 			}
 		);

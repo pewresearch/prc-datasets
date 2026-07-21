@@ -59,6 +59,24 @@ class Content_Type {
 	public static $atp_legal_key = 'is_atp';
 
 	/**
+	 * Meta key for the timestamp when new underlying data was uploaded.
+	 *
+	 * Used to split monthly download analytics before/after that day.
+	 *
+	 * @var string
+	 */
+	public static $new_data_uploaded_meta_key = 'new_data_uploaded';
+
+	/**
+	 * Site-local date (Y-m-d) when day-level download logging begins.
+	 *
+	 * Midnight on July 31 → first day keys written on 2026-08-01.
+	 *
+	 * @var string
+	 */
+	public const DAY_LOGGING_START_DATE = '2026-08-01';
+
+	/**
 	 * Settings for the dataset post type.
 	 *
 	 * @var array
@@ -167,7 +185,38 @@ class Content_Type {
 		$this->loader->add_action( 'admin_bar_menu', $this, 'modify_admin_bar_edit_link', 100 );
 		$this->loader->add_filter( 'prc_platform_post_report_package_materials', $this, 'get_datasets_for_report_materials', 10, 2 );
 		$this->loader->add_filter( 'prc_platform_pub_listing_default_args', $this, 'include_datasets_in_search', 10, 2 );
+		// Soft-cutover: keep FacetWP indexer hook while FacetWP remains installed.
 		$this->loader->add_filter( 'prc_platform__facetwp_indexer_query_args', $this, 'include_datasets_in_facetwp_indexer_query_args', 10, 1 );
+		$this->loader->add_action( 'pre_get_posts', $this, 'integrate_dataset_archive_with_elasticpress', 5, 1 );
+	}
+
+	/**
+	 * Opt the dataset post-type archive into ElasticPress + pub-listing visibility.
+	 *
+	 * Dataset archives are excluded from isPubListingQuery (post_type_archive),
+	 * so they need a dedicated EP opt-in and visibility defaults.
+	 *
+	 * @hook pre_get_posts
+	 *
+	 * @param \WP_Query $query The query.
+	 */
+	public function integrate_dataset_archive_with_elasticpress( $query ) {
+		if ( is_admin() || ! $query->is_main_query() ) {
+			return;
+		}
+		if ( ! $query->is_post_type_archive( self::$post_object_name ) ) {
+			return;
+		}
+
+		$query->set( 'isPubListingQuery', true );
+		$query->set( 'ep_integrate', true );
+
+		$args = \PRC\Platform\Publication_Listing\Query::get_filtered_query_args( $query->query_vars, $query );
+		// Keep the archive scoped to datasets.
+		$args['post_type'] = array( self::$post_object_name );
+		foreach ( $args as $key => $value ) {
+			$query->set( $key, $value );
+		}
 	}
 
 	/**
@@ -269,6 +318,39 @@ class Content_Type {
 				},
 			)
 		);
+
+		register_post_meta(
+			self::$post_object_name,
+			self::$new_data_uploaded_meta_key,
+			array(
+				'description'   => 'Site-local datetime when new underlying dataset data was uploaded (for monthly analytics splits).',
+				'show_in_rest'  => true,
+				'single'        => true,
+				'type'          => 'string',
+				'auth_callback' => function () {
+					return current_user_can( 'edit_posts' );
+				},
+			)
+		);
+	}
+
+	/**
+	 * Whether day-level download logging is enabled for the current site-local day.
+	 *
+	 * @return bool
+	 */
+	public static function is_day_logging_enabled(): bool {
+		return wp_date( 'Y-m-d' ) >= self::DAY_LOGGING_START_DATE;
+	}
+
+	/**
+	 * Build the yearly daily-downloads meta key.
+	 *
+	 * @param int|string $year Four-digit year.
+	 * @return string
+	 */
+	public static function get_daily_downloads_meta_key( $year ): string {
+		return '_downloads_daily_' . $year;
 	}
 
 	/**

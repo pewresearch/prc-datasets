@@ -38,6 +38,9 @@ class Rest_API {
 	 */
 	public function init() {
 		$this->loader->add_action( 'rest_api_init', $this, 'register_dataset_endpoints' );
+		$this->loader->add_action( 'updated_post_meta', $this, 'maybe_invalidate_stats_on_meta_change', 10, 4 );
+		$this->loader->add_action( 'added_post_meta', $this, 'maybe_invalidate_stats_on_meta_change', 10, 4 );
+		$this->loader->add_action( 'deleted_post_meta', $this, 'maybe_invalidate_stats_on_meta_delete', 10, 4 );
 	}
 
 	/**
@@ -442,26 +445,12 @@ class Rest_API {
 	 * Get the download log for a dataset object.
 	 *
 	 * @param mixed $object The object.
-	 * @return (int|array)[]|(int|array)[]
+	 * @return array{total: int, log: array, daily: array, new_data_uploaded: string|null, splits: array}
 	 */
 	public function restfully_get_download_log( $object ) {
 		$post_id = (int) $object['id'];
 
-		$to_return = array(
-			'total' => (int) get_post_meta( $post_id, '_total_downloads', true ),
-			'log'   => array(),
-		);
-
-		$start_year   = 2020;
-		$current_year = (int) gmdate( 'Y' );
-		$years        = range( $start_year, $current_year );
-
-		foreach ( $years as $year ) {
-			$meta_key                  = '_downloads_' . $year;
-			$to_return['log'][ $year ] = get_post_meta( $post_id, $meta_key, true );
-		}
-
-		return $to_return;
+		return self::get_download_stats( $post_id );
 	}
 
 	/**
@@ -490,24 +479,27 @@ class Rest_API {
 	}
 
 	/**
-	 * Get download stats for a dataset (total + yearly/monthly log).
+	 * Get download stats for a dataset (total + yearly/monthly/daily log + optional splits).
 	 *
 	 * Results are cached in a transient for 24 hours.
 	 *
 	 * @param int $dataset_id Dataset post ID.
-	 * @return array{total: int, log: array<int, mixed>}
+	 * @return array{total: int, log: array, daily: array, new_data_uploaded: string|null, splits: array}
 	 */
 	public static function get_download_stats( int $dataset_id ): array {
 		$cache_key   = 'dataset_downloads_' . $dataset_id;
 		$cached_data = get_transient( $cache_key );
 
-		if ( false !== $cached_data && is_array( $cached_data ) ) {
+		if ( false !== $cached_data && is_array( $cached_data ) && array_key_exists( 'daily', $cached_data ) ) {
 			return $cached_data;
 		}
 
 		$to_return = array(
-			'total' => (int) get_post_meta( $dataset_id, '_total_downloads', true ),
-			'log'   => array(),
+			'total'              => (int) get_post_meta( $dataset_id, '_total_downloads', true ),
+			'log'                => array(),
+			'daily'              => array(),
+			'new_data_uploaded'  => null,
+			'splits'             => array(),
 		);
 
 		$start_year   = 2020;
@@ -516,12 +508,110 @@ class Rest_API {
 
 		foreach ( $years as $year ) {
 			$meta_key                  = '_downloads_' . $year;
-			$to_return['log'][ $year ] = get_post_meta( $dataset_id, $meta_key, true );
+			$month_data                = get_post_meta( $dataset_id, $meta_key, true );
+			$to_return['log'][ $year ] = is_array( $month_data ) ? $month_data : array();
+
+			$daily_key                   = Content_Type::get_daily_downloads_meta_key( $year );
+			$daily_data                  = get_post_meta( $dataset_id, $daily_key, true );
+			$to_return['daily'][ $year ] = is_array( $daily_data ) ? $daily_data : array();
+		}
+
+		$new_data_uploaded = get_post_meta( $dataset_id, Content_Type::$new_data_uploaded_meta_key, true );
+		if ( is_string( $new_data_uploaded ) && '' !== $new_data_uploaded ) {
+			$to_return['new_data_uploaded'] = $new_data_uploaded;
+			$to_return['splits']            = self::compute_new_data_splits(
+				$to_return['daily'],
+				$new_data_uploaded
+			);
 		}
 
 		set_transient( $cache_key, $to_return, DAY_IN_SECONDS );
 
 		return $to_return;
+	}
+
+	/**
+	 * Invalidate download-stats cache when new_data_uploaded meta changes.
+	 *
+	 * @param int    $meta_id    Meta ID.
+	 * @param int    $object_id  Post ID.
+	 * @param string $meta_key   Meta key.
+	 * @param mixed  $meta_value Meta value.
+	 */
+	public function maybe_invalidate_stats_on_meta_change( $meta_id, $object_id, $meta_key, $meta_value ): void {
+		if ( Content_Type::$new_data_uploaded_meta_key !== $meta_key ) {
+			return;
+		}
+		if ( Content_Type::$post_object_name !== get_post_type( $object_id ) ) {
+			return;
+		}
+		self::invalidate_download_stats_cache( $object_id );
+	}
+
+	/**
+	 * Invalidate download-stats cache when new_data_uploaded meta is deleted.
+	 *
+	 * @param string[] $meta_ids   Meta IDs.
+	 * @param int      $object_id  Post ID.
+	 * @param string   $meta_key   Meta key.
+	 * @param mixed    $meta_value Meta value.
+	 */
+	public function maybe_invalidate_stats_on_meta_delete( $meta_ids, $object_id, $meta_key, $meta_value ): void {
+		$this->maybe_invalidate_stats_on_meta_change( 0, $object_id, $meta_key, $meta_value );
+	}
+
+	/**
+	 * Compute before/after download splits for the month containing new_data_uploaded.
+	 *
+	 * @param array  $daily             Daily bucket map keyed by year => month => day => count.
+	 * @param string $new_data_uploaded Site-local mysql datetime string.
+	 * @return array<string, array{before: int, after: int, upload_day: string}>
+	 */
+	public static function compute_new_data_splits( array $daily, string $new_data_uploaded ): array {
+		// Parse site-local mysql datetime as calendar components — do not run through
+		// strtotime()/wp_date(), which reinterprets the naive string via PHP then site TZ.
+		if ( ! preg_match( '/^(\d{4})-(\d{2})-(\d{2})/', $new_data_uploaded, $matches ) ) {
+			return array();
+		}
+
+		$year       = $matches[1];
+		$month      = $matches[2];
+		$upload_day = $matches[3];
+		$month_key  = $year . '-' . $month;
+
+		$days = $daily[ (int) $year ][ $month ] ?? $daily[ $year ][ $month ] ?? null;
+		if ( ! is_array( $days ) || empty( $days ) ) {
+			return array();
+		}
+
+		$before = 0;
+		$after  = 0;
+		foreach ( $days as $day => $count ) {
+			$day_padded = str_pad( (string) $day, 2, '0', STR_PAD_LEFT );
+			$count      = (int) $count;
+			if ( $day_padded < $upload_day ) {
+				$before += $count;
+			} else {
+				$after += $count;
+			}
+		}
+
+		return array(
+			$month_key => array(
+				'before'     => $before,
+				'after'      => $after,
+				'upload_day' => $upload_day,
+			),
+		);
+	}
+
+	/**
+	 * Invalidate the download-stats transient for a dataset.
+	 *
+	 * @param int|string $dataset_id Dataset post ID.
+	 */
+	public static function invalidate_download_stats_cache( $dataset_id ): void {
+		delete_transient( 'dataset_downloads_' . (int) $dataset_id );
 	}
 
 	/**
@@ -551,6 +641,7 @@ class Rest_API {
 		$updated = update_post_meta( $dataset_id, '_total_downloads', $total );
 
 		if ( false !== $updated ) {
+			self::invalidate_download_stats_cache( $dataset_id );
 			return true;
 		} else {
 			return new WP_Error( 'datasets/could-not-increment-total', 'Unable to increment download total.', array( 'status' => 500 ) );
@@ -558,7 +649,7 @@ class Rest_API {
 	}
 
 	/**
-	 * Log a download for a dataset.
+	 * Log a download for a dataset (monthly + optional daily buckets).
 	 *
 	 * @param mixed $dataset_id The dataset ID.
 	 * @return true|WP_Error
@@ -566,28 +657,50 @@ class Rest_API {
 	public function log_monthly_download_count( $dataset_id ) {
 		$year     = wp_date( 'Y' );
 		$month    = wp_date( 'm' );
+		$day      = wp_date( 'd' );
 		$meta_key = '_downloads_' . $year;
 
 		$data = get_post_meta( $dataset_id, $meta_key, true );
 
-		// Organize by date.
 		if ( ! is_array( $data ) ) {
 			$data = array();
 		}
 
 		if ( ! array_key_exists( $month, $data ) ) {
-			$data[ $month ] = 1;
+			$data[ $month ] = 0;
 		}
 
-		$data[ $month ] = $data[ $month ] + 1;
+		$data[ $month ] = (int) $data[ $month ] + 1;
 
 		$updated = update_post_meta( $dataset_id, $meta_key, $data );
 
-		if ( false !== $updated ) {
-			return true;
-		} else {
+		if ( false === $updated ) {
 			return new WP_Error( 'datasets/could-not-log-monthly', 'Unable to log monthly download data.', array( 'status' => 500 ) );
 		}
+
+		if ( Content_Type::is_day_logging_enabled() ) {
+			$daily_key  = Content_Type::get_daily_downloads_meta_key( $year );
+			$daily_data = get_post_meta( $dataset_id, $daily_key, true );
+			if ( ! is_array( $daily_data ) ) {
+				$daily_data = array();
+			}
+			if ( ! isset( $daily_data[ $month ] ) || ! is_array( $daily_data[ $month ] ) ) {
+				$daily_data[ $month ] = array();
+			}
+			if ( ! array_key_exists( $day, $daily_data[ $month ] ) ) {
+				$daily_data[ $month ][ $day ] = 0;
+			}
+			$daily_data[ $month ][ $day ] = (int) $daily_data[ $month ][ $day ] + 1;
+
+			$daily_updated = update_post_meta( $dataset_id, $daily_key, $daily_data );
+			if ( false === $daily_updated ) {
+				return new WP_Error( 'datasets/could-not-log-daily', 'Unable to log daily download data.', array( 'status' => 500 ) );
+			}
+		}
+
+		self::invalidate_download_stats_cache( $dataset_id );
+
+		return true;
 	}
 
 	/**
