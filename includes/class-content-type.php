@@ -181,6 +181,7 @@ class Content_Type {
 		$this->loader->add_action( 'init', $this, 'register_default_post_type_support', 5 );
 		$this->loader->add_action( 'init', $this, 'register_term_data_store' );
 		$this->loader->add_action( 'init', $this, 'archive_rewrites' );
+		$this->loader->add_filter( 'post_type_archive_link', $this, 'filter_post_type_archive_link', 10, 2 );
 		$this->loader->add_filter( 'prc_research_teams_rewrite_config', $this, 'register_research_teams_config' );
 		$this->loader->add_action( 'admin_bar_menu', $this, 'modify_admin_bar_edit_link', 100 );
 		$this->loader->add_filter( 'prc_platform_post_report_package_materials', $this, 'get_datasets_for_report_materials', 10, 2 );
@@ -366,6 +367,27 @@ class Content_Type {
 		foreach ( $rules as $rule => $query ) {
 			add_rewrite_rule( $rule, $query, 'top' );
 		}
+	}
+
+	/**
+	 * Return the pretty /datasets/ archive URL.
+	 *
+	 * The dataset CPT registers `rewrite => false` (custom rules + research-team
+	 * prefixes own routing), so core's `get_post_type_archive_link()` falls back
+	 * to `?post_type=dataset`. Consumers (canonical, OG, schema, Parse.ly) should
+	 * use the public path instead.
+	 *
+	 * @hook post_type_archive_link
+	 *
+	 * @param string $link      Archive permalink.
+	 * @param string $post_type Post type name.
+	 * @return string
+	 */
+	public function filter_post_type_archive_link( $link, $post_type ) {
+		if ( self::$post_object_name !== $post_type ) {
+			return $link;
+		}
+		return home_url( '/datasets/' );
 	}
 
 	/**

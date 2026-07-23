@@ -209,10 +209,9 @@ class Plugin {
 		new Ability( $this->get_loader() );
 		new Admin_Filter( $this->get_loader() );
 
-		if ( class_exists( 'PRC\Platform\Markdown_For_Agents\LLMs_Txt' ) ) {
-			require_once plugin_dir_path( __DIR__ ) . 'includes/class-llms-txt-section.php';
-			new Llms_Txt_Section( $this->get_loader() );
-		}
+		// Defer until plugins_loaded: prc-datasets loads alphabetically before
+		// prc-markdown-for-agents, so LLMs_Txt is not defined at bootstrap time.
+		$this->loader->add_action( 'plugins_loaded', $this, 'maybe_register_llms_txt_section' );
 
 		wp_register_block_metadata_collection(
 			plugin_dir_path( __DIR__ ) . 'build',
@@ -222,6 +221,24 @@ class Plugin {
 		$this->loader->add_action( 'init', $this, 'block_init' );
 		$this->loader->add_action( 'enqueue_block_editor_assets', $this, 'register_dataset_description_block' );
 		$this->loader->add_action( 'enqueue_block_editor_assets', $this, 'enqueue_inspector_panel' );
+	}
+
+	/**
+	 * Register the Datasets section in /llms.txt when markdown-for-agents is active.
+	 *
+	 * Must run on plugins_loaded (not at bootstrap) because active plugins load
+	 * alphabetically and prc-datasets can execute before prc-markdown-for-agents
+	 * defines LLMs_Txt.
+	 *
+	 * @hook plugins_loaded
+	 */
+	public function maybe_register_llms_txt_section(): void {
+		if ( ! class_exists( 'PRC\Platform\Markdown_For_Agents\LLMs_Txt' ) ) {
+			return;
+		}
+
+		require_once plugin_dir_path( __DIR__ ) . 'includes/class-llms-txt-section.php';
+		new Llms_Txt_Section( $this->get_loader() );
 	}
 
 	/**
