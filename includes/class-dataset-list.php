@@ -58,6 +58,16 @@ class Dataset_List {
 				'pageSlug'  => self::PAGE_SLUG,
 				'menuTitle' => __( 'All Datasets', 'prc-datasets' ),
 				'pageTitle' => __( 'All Datasets', 'prc-datasets' ),
+				'duplicate' => array(
+					'includeMeta' => array(
+						Content_Type::$download_meta_key,
+						Content_Type::$atp_legal_key,
+						'dataset_download_url',
+						'bylines',
+						'acknowledgements',
+						'displayBylines',
+					),
+				),
 			)
 		);
 	}
