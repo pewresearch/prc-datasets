@@ -33,6 +33,7 @@ import { dateI18n } from '@wordpress/date';
  * Internal Dependencies
  */
 import StatsPanel from './stats-panel';
+import AudiencePanel from './audience-panel';
 
 const PLUGIN_NAME = 'prc-platform-datasets-panel';
 const ALLOWED_TYPES = ['application/zip', 'application/pdf'];
@@ -103,6 +104,7 @@ function DatasetFileControls({ meta, setMeta }) {
 		const nextMeta = {
 			...meta,
 			_download_attachment_id: attachment.id,
+			_download_unavailable: false,
 		};
 		if (markAsNewData) {
 			nextMeta.new_data_uploaded = formatNewDataUploadedTimestamp();
@@ -210,6 +212,7 @@ function DatasetOptionsPanel() {
 					<DatasetFileControls meta={meta} setMeta={setMeta} />
 				</PanelBody>
 				<StatsPanel postId={postId} />
+				<AudiencePanel postId={postId} />
 			</PluginSidebar>
 			<PluginPrePublishPanel>
 				<PanelBody title="Review Dataset Options">

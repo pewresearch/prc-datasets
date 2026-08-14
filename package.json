@@ -1,15 +1,17 @@
 {
 	"name": "@prc/datasets",
-	"version": "1.1.0",
+	"version": "1.3.0",
 	"author": "PRC",
 	"license": "GPL-2.0-or-later",
 	"description": "Provides Datasets functionality for PRC Platform, a hybrid post type that combines the features of a traditional post type with a taxonomy along with a digital rights management system for managing access to dataset files.",
 	"scripts": {
-		"build": "npm run build:blocks && npm run build:inspector-panel",
+		"build": "npm run build:blocks && npm run build:inspector-panel && npm run build:admin-dataview",
 		"build:blocks": "wp-scripts build --experimental-modules --webpack-copy-php && wp-scripts build-blocks-manifest",
 		"build:inspector-panel": "wp-scripts build --source-path=includes/inspector-sidebar-panel/src --output-path=includes/inspector-sidebar-panel/build",
+		"build:admin-dataview": "wp-scripts build --config webpack.admin-dataview.config.js",
 		"start:blocks": "wp-scripts build-blocks-manifest; wp-scripts start --experimental-modules --webpack-copy-php",
-		"start:inspector-panel": "wp-scripts start --source-path=includes/inspector-sidebar-panel/src --output-path=includes/inspector-sidebar-panel/build"
+		"start:inspector-panel": "wp-scripts start --source-path=includes/inspector-sidebar-panel/src --output-path=includes/inspector-sidebar-panel/build",
+		"start:admin-dataview": "wp-scripts start --config webpack.admin-dataview.config.js"
 	},
 	"devDependencies": {
 		"@wordpress/scripts": "^31.4.0"

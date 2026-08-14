@@ -169,7 +169,7 @@ class Ability {
 				'permission_callback' => array( $this, 'can_get_download_url' ),
 				'meta'                => array(
 					'annotations'  => array(
-						'instructions' => 'Pass a dataset post_id to retrieve the downloadable file URL without logging a download. Optionally pass site_id to run against a specific multisite blog; defaults to the content site (20). If this plugin is inactive on the target site, the ability returns plugin_inactive_on_site. Requires Author role or higher (publish_posts) and edit_post on the dataset. Does not attempt legacy archive recovery.',
+						'instructions' => 'Pass a dataset post_id to retrieve the downloadable file URL without logging a download. Optionally pass site_id to run against a specific multisite blog; defaults to the content site (20). If this plugin is inactive on the target site, the ability returns plugin_inactive_on_site. Requires Author role or higher (publish_posts) and edit_post on the dataset. Does not stamp _download_unavailable.',
 						'readonly'     => true,
 						'destructive'  => false,
 						'idempotent'   => true,

@@ -155,166 +155,155 @@ class Rest_API {
 				},
 			)
 		);
-	}
-
-	/**
-	 * Get the original blog id from the post meta.
-	 *
-	 * @param int $post_id The post id.
-	 * @return int|null
-	 */
-	public static function legacy__get_original_blog_id( $post_id ) {
-		$value = get_post_meta( $post_id, 'dt_original_blog_id', true );
-		if ( is_numeric( $value ) ) {
-			return intval( $value );
-		} else {
-			return null;
-		}
-	}
-
-	/**
-	 * Get the original post id from the post meta.
-	 *
-	 * @param int $post_id The post id.
-	 * @return int|null
-	 */
-	public static function legacy__get_original_post_id( $post_id ) {
-		$value = get_post_meta( $post_id, 'dt_original_post_id', true );
-		if ( is_numeric( $value ) ) {
-			return intval( $value );
-		} else {
-			return null;
-		}
-	}
-
-	/**
-	 * Get the original site slug based on the site id.
-	 *
-	 * @param int $site_id The site id.
-	 * @return string
-	 */
-	protected static function legacy__get_original_site_slug( $site_id ) {
-		switch ( $site_id ) {
-			case 2:
-				return '/global';
-			case 3:
-				return '/social-trends';
-			case 4:
-				return '/politics';
-			case 5:
-				return '/hispanic';
-			case 7:
-				return '/religion';
-			case 8:
-				return '/journalism';
-			case 9:
-				return '/internet';
-			case 10:
-				return '/methods';
-			case 16:
-				return '/science';
-			case 18:
-				return '/race-ethnicity';
-			case 19:
-				return '/decoded';
-			default:
-				return '';
-		}
-	}
-
-	/**
-	 * Simple function to return the original site rest route. Replaces the post id from the current rest route with the original post id.
-	 *
-	 * @param int    $post_id The post id.
-	 * @param int    $original_post_id The original post id.
-	 * @param string $rest_route The rest route.
-	 * @return string
-	 */
-	protected static function legacy__get_original_rest_route( $post_id, $original_post_id, $rest_route ) {
-		return str_replace( $post_id, $original_post_id, $rest_route );
-	}
-
-	/**
-	 * Tries to find the download from the archive on legacy.pewresearch.org.
-	 * Once it finds it, it will enqueue an action to save the download to the current dataset
-	 * and return the download url for immediate download.
-	 *
-	 * @param int $dataset_id The dataset ID.
-	 * @return string | WP_Error
-	 */
-	public function attempt_download_from_archive( $dataset_id ) {
-		$original_blog_id = self::legacy__get_original_blog_id( $dataset_id );
-		$original_post_id = self::legacy__get_original_post_id( $dataset_id );
-
-		$original_site_slug = self::legacy__get_original_site_slug( $original_blog_id );
-
-		$original_rest_route = rest_get_route_for_post( $dataset_id );
-		$original_rest_route = self::legacy__get_original_rest_route(
-			$dataset_id,
-			$original_post_id,
-			$original_rest_route
-		);
-		$rest_endpoint       = 'https://legacy.pewresearch.org' . $original_site_slug . '/wp-json' . $original_rest_route;
-
-		$response = function_exists( 'vip_safe_wp_remote_get' )
-			? \vip_safe_wp_remote_get( $rest_endpoint )
-			: wp_remote_get( $rest_endpoint ); // phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.wp_remote_get_wp_remote_get -- Fallback when VIP function is unavailable (wp-env, Playground).
-		if ( is_wp_error( $response ) ) {
-			return new WP_Error(
-				'datasets/failed-to-get-original-dataset-from-archive',
-				'Failed to get the original dataset from the legacy archive.',
-				array(
-					'status' => 500,
-				)
-			);
-		}
-		$data = wp_remote_retrieve_body( $response );
-		if ( is_wp_error( $data ) ) {
-			return $data;
-		}
-		$data = json_decode( $data, true );
-		// We need to get one of the legacy dataset meta keys...
-		// If we find it, we should prepare to return it, but also fire off ACS async action to save it to the current dataset, so we'll pass it the current dataset id and the new url for the media.
-		$original_dataset_media_url = null;
-		if ( array_key_exists( 'dataset_download_url', $data ) ) {
-			$original_dataset_media_url = $data['dataset_download_url'];
-		}
-		if ( empty( $original_dataset_media_url ) ) {
-			return new WP_Error(
-				'datasets/failed-to-get-original-dataset-media-from-archive',
-				'Failed to get the original dataset media from the legacy archive.',
-				array(
-					'status' => 500,
-				)
-			);
-		}
-
-		// Schedule a migration of the dataset media from legacy to live.
-		as_enqueue_async_action(
-			'prc_dataset_recovery',
+		register_rest_route(
+			'prc-api/v3',
+			'datasets/audiences',
 			array(
-				'dataset_id' => $dataset_id,
-				'file_url'   => $original_dataset_media_url,
-			),
-			$dataset_id,
-			true,
-			5
+				array(
+					'methods'             => 'GET',
+					'callback'            => array( $this, 'restfully_list_audiences' ),
+					'args'                => array(
+						'dataset_id' => array(
+							'required' => true,
+							'type'     => 'integer',
+						),
+					),
+					'permission_callback' => array( $this, 'can_edit_dataset_from_request' ),
+				),
+				array(
+					'methods'             => 'DELETE',
+					'callback'            => array( $this, 'restfully_delete_audience' ),
+					'args'                => array(
+						'dataset_id'   => array(
+							'required' => true,
+							'type'     => 'integer',
+						),
+						'verification' => array(
+							'required' => false,
+							'type'     => 'string',
+						),
+						'key'          => array(
+							'required' => false,
+							'type'     => 'string',
+						),
+					),
+					'permission_callback' => array( $this, 'can_edit_dataset_from_request' ),
+				),
+			)
 		);
-
-		// Return the original dataset media url, so that the user can download it immediately.
-		return $original_dataset_media_url;
+		register_rest_route(
+			'prc-api/v3',
+			'datasets/build-audience',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'restfully_build_audience' ),
+				'args'                => array(
+					'dataset_id'   => array(
+						'required' => true,
+						'type'     => 'integer',
+					),
+					'verification' => array(
+						'required' => false,
+						'type'     => 'string',
+						'default'  => 'verified',
+					),
+				),
+				'permission_callback' => array( $this, 'can_edit_dataset_from_request' ),
+			)
+		);
 	}
 
 	/**
-	 * Resolve the download file URL for a dataset without logging or side effects.
+	 * Whether the current user can edit the dataset named in the request.
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return bool
+	 */
+	public function can_edit_dataset_from_request( $request ): bool {
+		$dataset_id = (int) $request->get_param( 'dataset_id' );
+		return $dataset_id > 0 && current_user_can( 'edit_post', $dataset_id );
+	}
+
+	/**
+	 * GET datasets/audiences
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return \WP_REST_Response|\WP_Error
+	 */
+	public function restfully_list_audiences( $request ) {
+		$dataset_id = (int) $request->get_param( 'dataset_id' );
+		$post       = get_post( $dataset_id );
+		if ( ! $post || Content_Type::$post_object_name !== $post->post_type ) {
+			return new \WP_Error(
+				'invalid_dataset',
+				'Dataset not found.',
+				array( 'status' => 404 )
+			);
+		}
+
+		return rest_ensure_response( Audience_Service::list_for_dataset( $dataset_id ) );
+	}
+
+	/**
+	 * POST datasets/build-audience
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return \WP_REST_Response|\WP_Error
+	 */
+	public function restfully_build_audience( $request ) {
+		$dataset_id   = (int) $request->get_param( 'dataset_id' );
+		$verification = (string) ( $request->get_param( 'verification' ) ?: 'verified' );
+
+		$result = Audience_Service::build( $dataset_id, $verification );
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
+
+		return rest_ensure_response( $result );
+	}
+
+	/**
+	 * DELETE datasets/audiences
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return \WP_REST_Response|\WP_Error
+	 */
+	public function restfully_delete_audience( $request ) {
+		$dataset_id   = (int) $request->get_param( 'dataset_id' );
+		$verification = $request->get_param( 'verification' );
+		$key          = $request->get_param( 'key' );
+
+		if ( empty( $verification ) && empty( $key ) ) {
+			return new \WP_Error(
+				'missing_audience_identity',
+				'Provide verification or key.',
+				array( 'status' => 400 )
+			);
+		}
+
+		$result = Audience_Service::delete(
+			$dataset_id,
+			is_string( $verification ) ? $verification : null,
+			is_string( $key ) ? $key : null
+		);
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
+
+		return rest_ensure_response( $result );
+	}
+
+	/**
+	 * Resolve the download file URL for a dataset.
 	 *
 	 * Looks up the media library attachment, then the legacy dataset_download_url meta.
-	 * Does not attempt legacy archive recovery (that path enqueues migration jobs).
+	 * When $record_unavailable is true, stamps or clears `_download_unavailable` meta.
 	 *
-	 * @param int $dataset_id Dataset post ID.
+	 * @param int  $dataset_id         Dataset post ID.
+	 * @param bool $record_unavailable Whether to stamp/clear download-unavailable meta.
 	 * @return array{file_url: string, attachment_id: int|null}|WP_Error
 	 */
-	public static function resolve_download_file_url( int $dataset_id ) {
+	public static function resolve_download_file_url( int $dataset_id, bool $record_unavailable = false ) {
 		$attachment_id = get_post_meta( $dataset_id, Content_Type::$download_meta_key, true );
 		$attachment_id = $attachment_id ? (int) $attachment_id : null;
 		$file_url      = null;
@@ -329,11 +318,18 @@ class Rest_API {
 		}
 
 		if ( empty( $file_url ) || ! is_string( $file_url ) ) {
+			if ( $record_unavailable ) {
+				update_post_meta( $dataset_id, Content_Type::$download_unavailable_meta_key, true );
+			}
 			return new WP_Error(
 				'datasets/failed-to-get-file-url',
 				'Failed to get the file url for the dataset.',
 				array( 'status' => 404 )
 			);
+		}
+
+		if ( $record_unavailable ) {
+			delete_post_meta( $dataset_id, Content_Type::$download_unavailable_meta_key );
 		}
 
 		return array(
@@ -366,16 +362,21 @@ class Rest_API {
 			return new WP_Error( 'no_id', 'No dataset ID provided.', array( 'status' => 400 ) );
 		}
 
-		$resolved = self::resolve_download_file_url( (int) $id );
-		if ( is_wp_error( $resolved ) ) {
-			// Fall back to legacy archive recovery for the public download path.
-			$file_url = $this->attempt_download_from_archive( $id );
-			if ( is_wp_error( $file_url ) ) {
-				return rest_ensure_response( $file_url );
-			}
-		} else {
-			$file_url = $resolved['file_url'];
+		$id = (int) $id;
+		if ( Content_Type::$post_object_name !== get_post_type( $id ) ) {
+			return new WP_Error(
+				'invalid_dataset',
+				'Post not found or is not a dataset.',
+				array( 'status' => 404 )
+			);
 		}
+
+		$resolved = self::resolve_download_file_url( $id, true );
+		if ( is_wp_error( $resolved ) ) {
+			return rest_ensure_response( $resolved );
+		}
+
+		$file_url = $resolved['file_url'];
 
 		// Log the download.
 		$this->increment_download_total( $id );

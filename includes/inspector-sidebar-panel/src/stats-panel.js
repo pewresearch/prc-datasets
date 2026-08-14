@@ -1,28 +1,21 @@
 /**
  * WordPress Dependencies
  */
-
 import { useMemo, useState, useEffect } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
-import { PanelBody, BaseControl, SelectControl } from '@wordpress/components';
+import {
+	PanelBody,
+	BaseControl,
+	__experimentalVStack as VStack,
+} from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
+import {
+	AnalyticsPeriodControls,
+	CalendarHeatmap,
+	MONTH_LABELS,
+} from '@prc/components';
 
 import './stats-panel.scss';
-
-const MONTH_LABELS = [
-	'Jan',
-	'Feb',
-	'Mar',
-	'Apr',
-	'May',
-	'Jun',
-	'Jul',
-	'Aug',
-	'Sep',
-	'Oct',
-	'Nov',
-	'Dec',
-];
 
 function useDatasetStats(postId) {
 	const [stats, setStats] = useState(null);
@@ -47,54 +40,11 @@ function useDatasetStats(postId) {
 	return stats;
 }
 
-function getHeatLevel(value, values) {
-	const max = Math.max(...values, 0);
-	const percentage = max > 0 ? (value / max) * 100 : 0;
-	if (value === 0) return 'none';
-	if (percentage <= 25) return 'low';
-	if (percentage <= 50) return 'medium';
-	if (percentage <= 75) return 'high';
-	return 'very-high';
-}
-
-function CalendarChart({
-	values = [],
-	labels = MONTH_LABELS,
-	renderValue,
-	highlightIndex = null,
-}) {
-	return (
-		<div className="calendar-chart">
-			{values.map((value, index) => (
-				<div
-					key={labels[index] || index}
-					className={`calendar-chart-item${
-						highlightIndex === index
-							? ' calendar-chart-item--highlight'
-							: ''
-					}`}
-					data-month={labels[index]}
-					data-heat={getHeatLevel(
-						typeof value === 'number' ? value : value?.total || 0,
-						values.map((v) =>
-							typeof v === 'number' ? v : v?.total || 0
-						)
-					)}
-				>
-					<span className="value">
-						{renderValue ? renderValue(value, index) : value}
-					</span>
-				</div>
-			))}
-		</div>
-	);
-}
-
 function daysInMonth(year, month) {
 	return new Date(year, month, 0).getDate();
 }
 
-export default function StatsPanel({ postId }) {
+export default function StatsPanel({ postId, embedded = false }) {
 	const datasetStats = useDatasetStats(postId);
 	const currentYear = new Date().getFullYear();
 
@@ -159,24 +109,14 @@ export default function StatsPanel({ postId }) {
 		return dayData.reduce((acc, curr) => acc + curr, 0);
 	}, [dayData]);
 
-	const monthOptions = useMemo(() => {
-		return [
-			{ label: __('All months', 'prc-datasets'), value: '' },
-			...MONTH_LABELS.map((label, index) => ({
-				label,
-				value: String(index + 1).padStart(2, '0'),
-			})),
-		];
-	}, []);
-
 	useEffect(() => {
 		if (years.length > 0 && !years.includes(String(selectedYear))) {
 			setSelectedYear(years[years.length - 1]);
 		}
 	}, [years, selectedYear]);
 
-	return (
-		<PanelBody title="Dataset Download Stats">
+	const content = (
+		<VStack spacing={4}>
 			{datasetStats?.total !== null &&
 				datasetStats?.total !== undefined && (
 					<p className="dataset-stats-all-time">
@@ -187,23 +127,15 @@ export default function StatsPanel({ postId }) {
 						)}
 					</p>
 				)}
-			<SelectControl
-				label={__('Select Year', 'prc-datasets')}
-				value={selectedYear}
-				options={years.map((year) => ({
-					label: year,
-					value: year,
-				}))}
-				onChange={(value) => {
-					setSelectedYear(value);
-					setSelectedMonth('');
-				}}
-			/>
-			<SelectControl
-				label={__('Select Month', 'prc-datasets')}
-				value={selectedMonth}
-				options={monthOptions}
-				onChange={setSelectedMonth}
+			<AnalyticsPeriodControls
+				years={years}
+				selectedYear={selectedYear}
+				onYearChange={setSelectedYear}
+				selectedMonth={selectedMonth}
+				onMonthChange={setSelectedMonth}
+				yearLabel={__('Select Year', 'prc-datasets')}
+				monthLabel={__('Select Month', 'prc-datasets')}
+				allMonthsLabel={__('All months', 'prc-datasets')}
 			/>
 			{!selectedMonth && (
 				<BaseControl
@@ -214,13 +146,14 @@ export default function StatsPanel({ postId }) {
 						monthTotal.toLocaleString()
 					)}
 				>
-					<CalendarChart
-						values={monthData}
-						renderValue={(item) => {
-							if (item.split) {
+					<CalendarHeatmap
+						values={monthData.map((m) => m.total)}
+						renderValue={(_, index) => {
+							const item = monthData[index];
+							if (item?.split) {
 								return `${item.split.before}|${item.split.after}`;
 							}
-							return item.total;
+							return item?.total;
 						}}
 					/>
 				</BaseControl>
@@ -265,7 +198,7 @@ export default function StatsPanel({ postId }) {
 							)}
 						</p>
 					) : (
-						<CalendarChart
+						<CalendarHeatmap
 							values={dayData}
 							labels={dayLabels}
 							highlightIndex={uploadDayIndex}
@@ -273,6 +206,12 @@ export default function StatsPanel({ postId }) {
 					)}
 				</BaseControl>
 			)}
-		</PanelBody>
+		</VStack>
 	);
+
+	if (embedded) {
+		return content;
+	}
+
+	return <PanelBody title="Dataset Download Stats">{content}</PanelBody>;
 }

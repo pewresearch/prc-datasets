@@ -45,6 +45,13 @@ class Content_Type {
 	public static $download_meta_key = '_download_attachment_id';
 
 	/**
+	 * The meta key for a failed public download resolution (no file URL).
+	 *
+	 * @var string
+	 */
+	public static $download_unavailable_meta_key = '_download_unavailable';
+
+	/**
 	 * The meta key for the total downloads.
 	 *
 	 * @var string
@@ -295,6 +302,20 @@ class Content_Type {
 			self::$atp_legal_key,
 			array(
 				'description'   => 'Is this dataset under the ATP legal agreement?',
+				'show_in_rest'  => true,
+				'single'        => true,
+				'type'          => 'boolean',
+				'auth_callback' => function () {
+					return current_user_can( 'edit_posts' );
+				},
+			)
+		);
+
+		register_post_meta(
+			self::$post_object_name,
+			self::$download_unavailable_meta_key,
+			array(
+				'description'   => 'True when a public download request could not resolve a file URL.',
 				'show_in_rest'  => true,
 				'single'        => true,
 				'type'          => 'boolean',

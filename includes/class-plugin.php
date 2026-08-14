@@ -138,6 +138,16 @@ class Plugin {
 		require_once plugin_dir_path( __DIR__ ) . 'includes/class-admin-filter.php';
 
 		/**
+		 * The class responsible for the shared DataViews list registration.
+		 */
+		require_once plugin_dir_path( __DIR__ ) . 'includes/class-dataset-list.php';
+
+		/**
+		 * Shared dataset audience build / list / delete service.
+		 */
+		require_once plugin_dir_path( __DIR__ ) . 'includes/class-audience-service.php';
+
+		/**
 		 * The class responsible for CLI commands.
 		 */
 		require_once plugin_dir_path( __DIR__ ) . 'includes/class-cli.php';
@@ -208,6 +218,7 @@ class Plugin {
 		new Ability_Categories( $this->get_loader() );
 		new Ability( $this->get_loader() );
 		new Admin_Filter( $this->get_loader() );
+		new Dataset_List( $this->get_loader() );
 
 		// Defer until plugins_loaded: prc-datasets loads alphabetically before
 		// prc-markdown-for-agents, so LLMs_Txt is not defined at bootstrap time.

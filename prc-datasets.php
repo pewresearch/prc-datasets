@@ -54,6 +54,8 @@ if ( ! defined( 'PRC_PLATFORM' ) ) {
  * Rename this for your plugin and update it as you release new versions.
  */
 define( 'PRC_DATASETS_VERSION', '1.0.0' );
+define( 'PRC_DATASETS_FILE', __FILE__ );
+define( 'PRC_DATASETS_DIR', __DIR__ );
 
 /**
  * The code that runs during plugin activation.
