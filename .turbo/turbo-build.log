@@ -1,138 +1,137 @@
 
-> @prc/datasets@1.2.1 build
+> @prc/datasets@1.2.0 build
 > npm run build:blocks && npm run build:inspector-panel && npm run build:admin-dataview
 
 
-> @prc/datasets@1.2.1 build:blocks
+> @prc/datasets@1.2.0 build:blocks
 > wp-scripts build --experimental-modules --webpack-copy-php && wp-scripts build-blocks-manifest
 
-assets by path [1m[32mdownload-block/[39m[22m 7.45 KiB
+assets by path download-block/ 7.45 KiB
   assets by chunk 2.47 KiB (name: download-block/index) 2 assets
-  assets by path [1m[32mdownload-block/*.css[39m[22m 2.13 KiB 2 assets
-  asset [1m[32mdownload-block/render.php[39m[22m 2.11 KiB [1m[32m[emitted][39m[22m [from: src/download-block/render.php] [1m[32m[copied][39m[22m
-  asset [1m[32mdownload-block/block.json[39m[22m 752 bytes [1m[32m[emitted][39m[22m [from: src/download-block/block.json] [1m[32m[copied][39m[22m
-assets by path [1m[32mdataset-atp-legal-acceptance-block/[39m[22m 4.43 KiB
+  assets by path download-block/*.css 2.13 KiB 2 assets
+  asset download-block/render.php 2.11 KiB [compared for emit] [from: src/download-block/render.php] [copied]
+  asset download-block/block.json 752 bytes [compared for emit] [from: src/download-block/block.json] [copied]
+assets by path dataset-atp-legal-acceptance-block/ 4.43 KiB
   assets by chunk 2.11 KiB (name: dataset-atp-legal-acceptance-block/index) 2 assets
   assets by chunk 638 bytes (id hint: style) 2 assets
-  asset [1m[32mdataset-atp-legal-acceptance-block/render.php[39m[22m 1.08 KiB [1m[32m[emitted][39m[22m [from: src/dataset-atp-legal-acceptance-block/render.php] [1m[32m[copied][39m[22m
-  asset [1m[32mdataset-atp-legal-acceptance-block/block.json[39m[22m 644 bytes [1m[32m[emitted][39m[22m [from: src/dataset-atp-legal-acceptance-block/block.json] [1m[32m[copied][39m[22m
-assets by path [1m[32mdataset-description-block/[39m[22m 966 bytes
-  asset [1m[32mdataset-description-block/index.js[39m[22m 516 bytes [1m[32m[emitted][39m[22m [1m[32m[minimized][39m[22m (name: dataset-description-block/index)
-  asset [1m[32mdataset-description-block/block.json[39m[22m 340 bytes [1m[32m[emitted][39m[22m [from: src/dataset-description-block/block.json] [1m[32m[copied][39m[22m
-  asset [1m[32mdataset-description-block/index.asset.php[39m[22m 110 bytes [1m[32m[emitted][39m[22m (name: dataset-description-block/index)
-Entrypoint [1mdataset-atp-legal-acceptance-block/index[39m[22m 2.73 KiB = [1m[32mdataset-atp-legal-acceptance-block/style-index.css[39m[22m 319 bytes [1m[32mdataset-atp-legal-acceptance-block/style-index-rtl.css[39m[22m 319 bytes [1m[32mdataset-atp-legal-acceptance-block/index.js[39m[22m 1.96 KiB [1m[32mdataset-atp-legal-acceptance-block/index.asset.php[39m[22m 152 bytes
-Entrypoint [1mdataset-description-block/index[39m[22m 626 bytes = [1m[32mdataset-description-block/index.js[39m[22m 516 bytes [1m[32mdataset-description-block/index.asset.php[39m[22m 110 bytes
-Entrypoint [1mdownload-block/index[39m[22m 4.61 KiB = [1m[32mdownload-block/style-index.css[39m[22m 1.07 KiB [1m[32mdownload-block/style-index-rtl.css[39m[22m 1.07 KiB [1m[32mdownload-block/index.js[39m[22m 2.29 KiB [1m[32mdownload-block/index.asset.php[39m[22m 183 bytes
-orphan modules 220 KiB (javascript) 1.83 KiB (runtime) [1m[33m[orphan][39m[22m 342 modules
+  asset dataset-atp-legal-acceptance-block/render.php 1.08 KiB [compared for emit] [from: src/dataset-atp-legal-acceptance-block/render.php] [copied]
+  asset dataset-atp-legal-acceptance-block/block.json 644 bytes [compared for emit] [from: src/dataset-atp-legal-acceptance-block/block.json] [copied]
+assets by path dataset-description-block/ 966 bytes
+  asset dataset-description-block/index.js 516 bytes [compared for emit] [minimized] (name: dataset-description-block/index)
+  asset dataset-description-block/block.json 340 bytes [compared for emit] [from: src/dataset-description-block/block.json] [copied]
+  asset dataset-description-block/index.asset.php 110 bytes [compared for emit] (name: dataset-description-block/index)
+Entrypoint dataset-atp-legal-acceptance-block/index 2.73 KiB = dataset-atp-legal-acceptance-block/style-index.css 319 bytes dataset-atp-legal-acceptance-block/style-index-rtl.css 319 bytes dataset-atp-legal-acceptance-block/index.js 1.96 KiB dataset-atp-legal-acceptance-block/index.asset.php 152 bytes
+Entrypoint dataset-description-block/index 626 bytes = dataset-description-block/index.js 516 bytes dataset-description-block/index.asset.php 110 bytes
+Entrypoint download-block/index 4.61 KiB = download-block/style-index.css 1.07 KiB download-block/style-index-rtl.css 1.07 KiB download-block/index.js 2.29 KiB download-block/index.asset.php 183 bytes
+orphan modules 220 KiB (javascript) 1.83 KiB (runtime) [orphan] 342 modules
 runtime modules 5 KiB 6 modules
-built modules 8.8 KiB (javascript) 1.38 KiB (css/mini-extract) [1m[33m[built][39m[22m
+built modules 8.8 KiB (javascript) 1.38 KiB (css/mini-extract) [built]
   javascript modules 8.8 KiB
-    [1m./src/dataset-atp-legal-acceptance-block/index.js + 7 modules[39m[22m 3.13 KiB [1m[31m[not cacheable][39m[22m [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-    [1m./src/dataset-description-block/index.js + 3 modules[39m[22m 915 bytes [1m[31m[not cacheable][39m[22m [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-    [1m./src/download-block/index.js + 10 modules[39m[22m 4.78 KiB [1m[31m[not cacheable][39m[22m [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+    ./src/dataset-atp-legal-acceptance-block/index.js + 7 modules 3.13 KiB [not cacheable] [built] [code generated]
+    ./src/dataset-description-block/index.js + 3 modules 915 bytes [not cacheable] [built] [code generated]
+    ./src/download-block/index.js + 10 modules 4.78 KiB [not cacheable] [built] [code generated]
   cacheable modules 1.38 KiB
-    css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]![1m./src/dataset-atp-legal-acceptance-block/style.scss[39m[22m 318 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-    css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]![1m./src/download-block/style.scss[39m[22m 1.06 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-webpack 5.106.2 compiled [1m[32msuccessfully[39m[22m in 15756 ms
+    css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]!./src/dataset-atp-legal-acceptance-block/style.scss 318 bytes [built] [code generated]
+    css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]!./src/download-block/style.scss 1.06 KiB [built] [code generated]
+webpack 5.106.2 compiled successfully in 4499 ms
 
-assets by path [1m[32mdataset-atp-legal-acceptance-block/[39m[22m 8.36 KiB
-  asset [1m[32mdataset-atp-legal-acceptance-block/view.js[39m[22m 8.23 KiB [1m[32m[emitted][39m[22m [javascript module] [1m[32m[minimized][39m[22m (name: dataset-atp-legal-acceptance-block/view)
-  asset [1m[32mdataset-atp-legal-acceptance-block/view.asset.php[39m[22m 130 bytes [1m[32m[emitted][39m[22m (name: dataset-atp-legal-acceptance-block/view)
-assets by path [1m[32mdownload-block/[39m[22m 1.65 KiB
-  asset [1m[32mdownload-block/view.js[39m[22m 1.52 KiB [1m[32m[emitted][39m[22m [javascript module] [1m[32m[minimized][39m[22m (name: download-block/view)
-  asset [1m[32mdownload-block/view.asset.php[39m[22m 130 bytes [1m[32m[emitted][39m[22m (name: download-block/view)
-Entrypoint [1mdataset-atp-legal-acceptance-block/view[39m[22m 8.36 KiB = [1m[32mdataset-atp-legal-acceptance-block/view.js[39m[22m 8.23 KiB [1m[32mdataset-atp-legal-acceptance-block/view.asset.php[39m[22m 130 bytes
-Entrypoint [1mdownload-block/view[39m[22m 1.65 KiB = [1m[32mdownload-block/view.js[39m[22m 1.52 KiB [1m[32mdownload-block/view.asset.php[39m[22m 130 bytes
-orphan modules 42 bytes [1m[33m[orphan][39m[22m 1 module
-[1m./src/dataset-atp-legal-acceptance-block/view.js + 1 modules[39m[22m 8.9 KiB [1m[31m[not cacheable][39m[22m [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-[1m./src/download-block/view.js + 1 modules[39m[22m 3.41 KiB [1m[31m[not cacheable][39m[22m [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-webpack 5.106.2 compiled [1m[32msuccessfully[39m[22m in 8439 ms
+assets by path dataset-atp-legal-acceptance-block/ 8.36 KiB
+  asset dataset-atp-legal-acceptance-block/view.js 8.23 KiB [compared for emit] [javascript module] [minimized] (name: dataset-atp-legal-acceptance-block/view)
+  asset dataset-atp-legal-acceptance-block/view.asset.php 130 bytes [compared for emit] (name: dataset-atp-legal-acceptance-block/view)
+assets by path download-block/ 1.65 KiB
+  asset download-block/view.js 1.52 KiB [compared for emit] [javascript module] [minimized] (name: download-block/view)
+  asset download-block/view.asset.php 130 bytes [compared for emit] (name: download-block/view)
+Entrypoint dataset-atp-legal-acceptance-block/view 8.36 KiB = dataset-atp-legal-acceptance-block/view.js 8.23 KiB dataset-atp-legal-acceptance-block/view.asset.php 130 bytes
+Entrypoint download-block/view 1.65 KiB = download-block/view.js 1.52 KiB download-block/view.asset.php 130 bytes
+orphan modules 42 bytes [orphan] 1 module
+./src/dataset-atp-legal-acceptance-block/view.js + 1 modules 8.9 KiB [not cacheable] [built] [code generated]
+./src/download-block/view.js + 1 modules 3.41 KiB [not cacheable] [built] [code generated]
+webpack 5.106.2 compiled successfully in 2023 ms
 Block metadata PHP file generated at: build/blocks-manifest.php
 
-> @prc/datasets@1.2.1 build:inspector-panel
+> @prc/datasets@1.2.0 build:inspector-panel
 > wp-scripts build --source-path=includes/inspector-sidebar-panel/src --output-path=includes/inspector-sidebar-panel/build
 
-assets by path [1m[32m*.css[39m[22m 152 bytes
-  asset [1m[32mindex-rtl.css[39m[22m 76 bytes [1m[32m[emitted][39m[22m (name: index)
-  asset [1m[32mindex.css[39m[22m 76 bytes [1m[32m[emitted][39m[22m (name: index)
-asset [1m[32mindex.js[39m[22m 8.88 KiB [1m[32m[emitted][39m[22m [1m[32m[minimized][39m[22m (name: index)
-asset [1m[32mindex.asset.php[39m[22m 292 bytes [1m[32m[emitted][39m[22m (name: index)
-Entrypoint [1mindex[39m[22m 9.31 KiB = [1m[32mindex.css[39m[22m 76 bytes [1m[32mindex.js[39m[22m 8.88 KiB [1m[32mindex-rtl.css[39m[22m 76 bytes [1m[32mindex.asset.php[39m[22m 292 bytes
-orphan modules 223 KiB (javascript) 937 bytes (runtime) [1m[33m[orphan][39m[22m 338 modules
+assets by path *.css 152 bytes
+  asset index-rtl.css 76 bytes [emitted] (name: index)
+  asset index.css 76 bytes [emitted] (name: index)
+asset index.js 8.88 KiB [emitted] [minimized] (name: index)
+asset index.asset.php 292 bytes [emitted] [compared for emit] (name: index)
+Entrypoint index 9.31 KiB = index.css 76 bytes index.js 8.88 KiB index-rtl.css 76 bytes index.asset.php 292 bytes
+orphan modules 223 KiB (javascript) 937 bytes (runtime) [orphan] 338 modules
 runtime modules 663 bytes 3 modules
-built modules 17.6 KiB (javascript) 75 bytes (css/mini-extract) [1m[33m[built][39m[22m
-  [1m./includes/inspector-sidebar-panel/src/index.js + 18 modules[39m[22m 17.6 KiB [1m[31m[not cacheable][39m[22m [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-  css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]![1m./includes/inspector-sidebar-panel/src/stats-panel.scss[39m[22m 75 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-webpack 5.106.2 compiled [1m[32msuccessfully[39m[22m in 14916 ms
+built modules 17.6 KiB (javascript) 75 bytes (css/mini-extract) [built]
+  ./includes/inspector-sidebar-panel/src/index.js + 18 modules 17.6 KiB [not cacheable] [built] [code generated]
+  css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]!./includes/inspector-sidebar-panel/src/stats-panel.scss 75 bytes [built] [code generated]
+webpack 5.106.2 compiled successfully in 1897 ms
 
-> @prc/datasets@1.2.1 build:admin-dataview
+> @prc/datasets@1.2.0 build:admin-dataview
 > wp-scripts build --config webpack.admin-dataview.config.js
 
 assets by chunk 820 KiB (name: index)
-  assets by path [1m[32m*.css[39m[22m 3.53 KiB
-    asset [1m[32mindex-rtl.css[39m[22m 1.76 KiB [1m[32m[emitted][39m[22m (name: index)
-    asset [1m[32mindex.css[39m[22m 1.76 KiB [1m[32m[emitted][39m[22m (name: index)
-  asset [1m[33mindex.js[39m[22m [1m[33m816 KiB[39m[22m [1m[32m[emitted][39m[22m [1m[32m[minimized][39m[22m [1m[33m[big][39m[22m (name: index)
-  asset [1m[32mindex.asset.php[39m[22m 384 bytes [1m[32m[emitted][39m[22m (name: index)
-assets by path [1m[32m./*.css[39m[22m 181 KiB
-  asset [1m[32m./style-index-rtl.css[39m[22m 90.6 KiB [1m[32m[emitted][39m[22m (name: ./style-index) (id hint: style)
-  asset [1m[32m./style-index.css[39m[22m 90.6 KiB [1m[32m[emitted][39m[22m (name: ./style-index) (id hint: style)
-Entrypoint [1mindex[39m[22m [1m[33m[big][39m[22m 1000 KiB = 6 assets
-orphan modules 9.5 MiB (javascript) 5.49 KiB (runtime) [1m[33m[orphan][39m[22m 4092 modules
+  assets by path *.css 3.53 KiB
+    asset index-rtl.css 1.76 KiB [emitted] (name: index)
+    asset index.css 1.76 KiB [emitted] (name: index)
+  asset index.js 816 KiB [emitted] [minimized] [big] (name: index)
+  asset index.asset.php 384 bytes [emitted] (name: index)
+assets by path ./*.css 138 KiB
+  asset ./style-index-rtl.css 69.3 KiB [emitted] (name: ./style-index) (id hint: style)
+  asset ./style-index.css 69.2 KiB [emitted] (name: ./style-index) (id hint: style)
+Entrypoint index [big] 959 KiB = 6 assets
+orphan modules 6.93 MiB (javascript) 5.49 KiB (runtime) [orphan] 3326 modules
 runtime modules 3.33 KiB 6 modules
-built modules 2.23 MiB (javascript) 92.4 KiB (css/mini-extract) [1m[33m[built][39m[22m
-  modules by path [1m../[39m[22m 83.9 KiB (javascript) 92.1 KiB (css/mini-extract)
+built modules 2.23 MiB (javascript) 71 KiB (css/mini-extract) [built]
+  modules by path ../ 83.9 KiB (javascript) 70.7 KiB (css/mini-extract)
     javascript modules 83.9 KiB
-      modules by path [1m../../node_modules/prop-types/[39m[22m 2.6 KiB 3 modules
+      modules by path ../../node_modules/prop-types/ 2.6 KiB 3 modules
       + 3 modules
-    css modules 92.1 KiB
-      css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]![1m../prc-scripts/includes/scripts/src/@prc/components/icon-picker/styles.scss[39m[22m 558 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-      css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]![1m../prc-scripts/includes/scripts/src/@prc/components/ai/styles.scss[39m[22m 1.14 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+    css modules 70.7 KiB
+      css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]!../prc-scripts/includes/scripts/src/@prc/components/icon-picker/styles.scss 558 bytes [built] [code generated]
+      css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]!../prc-scripts/includes/scripts/src/@prc/components/ai/styles.scss 1.14 KiB [built] [code generated]
       + 2 modules
-  modules by path [1m./[39m[22m 2.15 MiB (javascript) 294 bytes (css/mini-extract)
-    [1m./src/admin-dataview/index.jsx + 341 modules[39m[22m 2.15 MiB [1m[31m[not cacheable][39m[22m [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-    css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]![1m./src/admin-dataview/style.scss[39m[22m 219 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-    css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]![1m./includes/inspector-sidebar-panel/src/stats-panel.scss[39m[22m 75 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+  modules by path ./ 2.15 MiB (javascript) 294 bytes (css/mini-extract)
+    ./src/admin-dataview/index.jsx + 341 modules 2.15 MiB [not cacheable] [built] [code generated]
+    css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]!./src/admin-dataview/style.scss 219 bytes [built] [code generated]
+    css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]!./includes/inspector-sidebar-panel/src/stats-panel.scss 75 bytes [built] [code generated]
 
-[1m[33mWARNING[39m[22m in [1m../prc-scripts/includes/scripts/src/@prc/components/auth-provider-context/index.js[39m[22m [1m[32m108:14-38[39m[22m
-[1mexport 'currentUser' (imported as 'firebaseAuth') was [1m[31mnot found[39m[22m[1m in 'firebase/auth' (possible exports: [1m[32mActionCodeOperation, ActionCodeURL, AuthCredential, AuthErrorCodes, EmailAuthCredential, EmailAuthProvider, FacebookAuthProvider, FactorId, GithubAuthProvider, GoogleAuthProvider, OAuthCredential, OAuthProvider, OperationType, PhoneAuthCredential, PhoneAuthProvider, PhoneMultiFactorGenerator, ProviderId, RecaptchaVerifier, SAMLAuthProvider, SignInMethod, TotpMultiFactorGenerator, TotpSecret, TwitterAuthProvider, applyActionCode, beforeAuthStateChanged, browserLocalPersistence, browserPopupRedirectResolver, browserSessionPersistence, checkActionCode, confirmPasswordReset, connectAuthEmulator, createUserWithEmailAndPassword, debugErrorMap, deleteUser, fetchSignInMethodsForEmail, getAdditionalUserInfo, getAuth, getIdToken, getIdTokenResult, getMultiFactorResolver, getRedirectResult, inMemoryPersistence, indexedDBLocalPersistence, initializeAuth, initializeRecaptchaConfig, isSignInWithEmailLink, linkWithCredential, linkWithPhoneNumber, linkWithPopup, linkWithRedirect, multiFactor, onAuthStateChanged, onIdTokenChanged, parseActionCodeURL, prodErrorMap, reauthenticateWithCredential, reauthenticateWithPhoneNumber, reauthenticateWithPopup, reauthenticateWithRedirect, reload, revokeAccessToken, sendEmailVerification, sendPasswordResetEmail, sendSignInLinkToEmail, setPersistence, signInAnonymously, signInWithCredential, signInWithCustomToken, signInWithEmailAndPassword, signInWithEmailLink, signInWithPhoneNumber, signInWithPopup, signInWithRedirect, signOut, unlink, updateCurrentUser, updateEmail, updatePassword, updatePhoneNumber, updateProfile, useDeviceLanguage, validatePassword, verifyBeforeUpdateEmail, verifyPasswordResetCode[39m[22m[1m)[39m[22m
+WARNING in ../prc-scripts/includes/scripts/src/@prc/components/auth-provider-context/index.js 108:14-38
+export 'currentUser' (imported as 'firebaseAuth') was not found in 'firebase/auth' (possible exports: ActionCodeOperation, ActionCodeURL, AuthCredential, AuthErrorCodes, EmailAuthCredential, EmailAuthProvider, FacebookAuthProvider, FactorId, GithubAuthProvider, GoogleAuthProvider, OAuthCredential, OAuthProvider, OperationType, PhoneAuthCredential, PhoneAuthProvider, PhoneMultiFactorGenerator, ProviderId, RecaptchaVerifier, SAMLAuthProvider, SignInMethod, TotpMultiFactorGenerator, TotpSecret, TwitterAuthProvider, applyActionCode, beforeAuthStateChanged, browserLocalPersistence, browserPopupRedirectResolver, browserSessionPersistence, checkActionCode, confirmPasswordReset, connectAuthEmulator, createUserWithEmailAndPassword, debugErrorMap, deleteUser, fetchSignInMethodsForEmail, getAdditionalUserInfo, getAuth, getIdToken, getIdTokenResult, getMultiFactorResolver, getRedirectResult, inMemoryPersistence, indexedDBLocalPersistence, initializeAuth, initializeRecaptchaConfig, isSignInWithEmailLink, linkWithCredential, linkWithPhoneNumber, linkWithPopup, linkWithRedirect, multiFactor, onAuthStateChanged, onIdTokenChanged, parseActionCodeURL, prodErrorMap, reauthenticateWithCredential, reauthenticateWithPhoneNumber, reauthenticateWithPopup, reauthenticateWithRedirect, reload, revokeAccessToken, sendEmailVerification, sendPasswordResetEmail, sendSignInLinkToEmail, setPersistence, signInAnonymously, signInWithCredential, signInWithCustomToken, signInWithEmailAndPassword, signInWithEmailLink, signInWithPhoneNumber, signInWithPopup, signInWithRedirect, signOut, unlink, updateCurrentUser, updateEmail, updatePassword, updatePhoneNumber, updateProfile, useDeviceLanguage, validatePassword, verifyBeforeUpdateEmail, verifyPasswordResetCode)
  @ ../prc-scripts/includes/scripts/src/@prc/components/exports.ts 7:0-63 7:0-63 7:0-63
  @ ./includes/inspector-sidebar-panel/src/stats-panel.js 8:0-89 107:26-49 120:34-49 133:56-68 140:29-44
  @ ./src/admin-dataview/dataset-stats-modal.jsx 10:0-80 29:28-38
  @ ./src/admin-dataview/index.jsx 13:0-54 42:27-44
 
-[1m[33mWARNING[39m[22m in [1m../prc-scripts/includes/scripts/src/@prc/components/auth-provider-context/index.js[39m[22m [1m[32m120:14-38[39m[22m
-[1mexport 'currentUser' (imported as 'firebaseAuth') was [1m[31mnot found[39m[22m[1m in 'firebase/auth' (possible exports: [1m[32mActionCodeOperation, ActionCodeURL, AuthCredential, AuthErrorCodes, EmailAuthCredential, EmailAuthProvider, FacebookAuthProvider, FactorId, GithubAuthProvider, GoogleAuthProvider, OAuthCredential, OAuthProvider, OperationType, PhoneAuthCredential, PhoneAuthProvider, PhoneMultiFactorGenerator, ProviderId, RecaptchaVerifier, SAMLAuthProvider, SignInMethod, TotpMultiFactorGenerator, TotpSecret, TwitterAuthProvider, applyActionCode, beforeAuthStateChanged, browserLocalPersistence, browserPopupRedirectResolver, browserSessionPersistence, checkActionCode, confirmPasswordReset, connectAuthEmulator, createUserWithEmailAndPassword, debugErrorMap, deleteUser, fetchSignInMethodsForEmail, getAdditionalUserInfo, getAuth, getIdToken, getIdTokenResult, getMultiFactorResolver, getRedirectResult, inMemoryPersistence, indexedDBLocalPersistence, initializeAuth, initializeRecaptchaConfig, isSignInWithEmailLink, linkWithCredential, linkWithPhoneNumber, linkWithPopup, linkWithRedirect, multiFactor, onAuthStateChanged, onIdTokenChanged, parseActionCodeURL, prodErrorMap, reauthenticateWithCredential, reauthenticateWithPhoneNumber, reauthenticateWithPopup, reauthenticateWithRedirect, reload, revokeAccessToken, sendEmailVerification, sendPasswordResetEmail, sendSignInLinkToEmail, setPersistence, signInAnonymously, signInWithCredential, signInWithCustomToken, signInWithEmailAndPassword, signInWithEmailLink, signInWithPhoneNumber, signInWithPopup, signInWithRedirect, signOut, unlink, updateCurrentUser, updateEmail, updatePassword, updatePhoneNumber, updateProfile, useDeviceLanguage, validatePassword, verifyBeforeUpdateEmail, verifyPasswordResetCode[39m[22m[1m)[39m[22m
+WARNING in ../prc-scripts/includes/scripts/src/@prc/components/auth-provider-context/index.js 120:14-38
+export 'currentUser' (imported as 'firebaseAuth') was not found in 'firebase/auth' (possible exports: ActionCodeOperation, ActionCodeURL, AuthCredential, AuthErrorCodes, EmailAuthCredential, EmailAuthProvider, FacebookAuthProvider, FactorId, GithubAuthProvider, GoogleAuthProvider, OAuthCredential, OAuthProvider, OperationType, PhoneAuthCredential, PhoneAuthProvider, PhoneMultiFactorGenerator, ProviderId, RecaptchaVerifier, SAMLAuthProvider, SignInMethod, TotpMultiFactorGenerator, TotpSecret, TwitterAuthProvider, applyActionCode, beforeAuthStateChanged, browserLocalPersistence, browserPopupRedirectResolver, browserSessionPersistence, checkActionCode, confirmPasswordReset, connectAuthEmulator, createUserWithEmailAndPassword, debugErrorMap, deleteUser, fetchSignInMethodsForEmail, getAdditionalUserInfo, getAuth, getIdToken, getIdTokenResult, getMultiFactorResolver, getRedirectResult, inMemoryPersistence, indexedDBLocalPersistence, initializeAuth, initializeRecaptchaConfig, isSignInWithEmailLink, linkWithCredential, linkWithPhoneNumber, linkWithPopup, linkWithRedirect, multiFactor, onAuthStateChanged, onIdTokenChanged, parseActionCodeURL, prodErrorMap, reauthenticateWithCredential, reauthenticateWithPhoneNumber, reauthenticateWithPopup, reauthenticateWithRedirect, reload, revokeAccessToken, sendEmailVerification, sendPasswordResetEmail, sendSignInLinkToEmail, setPersistence, signInAnonymously, signInWithCredential, signInWithCustomToken, signInWithEmailAndPassword, signInWithEmailLink, signInWithPhoneNumber, signInWithPopup, signInWithRedirect, signOut, unlink, updateCurrentUser, updateEmail, updatePassword, updatePhoneNumber, updateProfile, useDeviceLanguage, validatePassword, verifyBeforeUpdateEmail, verifyPasswordResetCode)
  @ ../prc-scripts/includes/scripts/src/@prc/components/exports.ts 7:0-63 7:0-63 7:0-63
  @ ./includes/inspector-sidebar-panel/src/stats-panel.js 8:0-89 107:26-49 120:34-49 133:56-68 140:29-44
  @ ./src/admin-dataview/dataset-stats-modal.jsx 10:0-80 29:28-38
  @ ./src/admin-dataview/index.jsx 13:0-54 42:27-44
 
-[1m[33mWARNING[39m[22m in [1m../prc-scripts/includes/scripts/src/@prc/components/auth-provider-context/index.js[39m[22m [1m[32m171:4-21[39m[22m
-[1mexport 'database' (imported as 'firebase') was [1m[31mnot found[39m[22m[1m in 'firebase/app' (possible exports: [1m[32mFirebaseError, SDK_VERSION, _DEFAULT_ENTRY_NAME, _addComponent, _addOrOverwriteComponent, _apps, _clearComponents, _components, _getProvider, _isFirebaseApp, _isFirebaseServerApp, _registerComponent, _removeServiceInstance, _serverApps, deleteApp, getApp, getApps, initializeApp, initializeServerApp, onLog, registerVersion, setLogLevel[39m[22m[1m)[39m[22m
+WARNING in ../prc-scripts/includes/scripts/src/@prc/components/auth-provider-context/index.js 171:4-21
+export 'database' (imported as 'firebase') was not found in 'firebase/app' (possible exports: FirebaseError, SDK_VERSION, _DEFAULT_ENTRY_NAME, _addComponent, _addOrOverwriteComponent, _apps, _clearComponents, _components, _getProvider, _isFirebaseApp, _isFirebaseServerApp, _registerComponent, _removeServiceInstance, _serverApps, deleteApp, getApp, getApps, initializeApp, initializeServerApp, onLog, registerVersion, setLogLevel)
  @ ../prc-scripts/includes/scripts/src/@prc/components/exports.ts 7:0-63 7:0-63 7:0-63
  @ ./includes/inspector-sidebar-panel/src/stats-panel.js 8:0-89 107:26-49 120:34-49 133:56-68 140:29-44
  @ ./src/admin-dataview/dataset-stats-modal.jsx 10:0-80 29:28-38
  @ ./src/admin-dataview/index.jsx 13:0-54 42:27-44
 
-[1m[33mWARNING[39m[22m in [1masset size limit: The following asset(s) exceed the recommended size limit (244 KiB).
+WARNING in asset size limit: The following asset(s) exceed the recommended size limit (244 KiB).
 This can impact web performance.
 Assets: 
-  index.js (816 KiB)[39m[22m
+  index.js (816 KiB)
 
-[1m[33mWARNING[39m[22m in [1mentrypoint size limit: The following entrypoint(s) combined asset size exceeds the recommended limit (244 KiB). This can impact web performance.
+WARNING in entrypoint size limit: The following entrypoint(s) combined asset size exceeds the recommended limit (244 KiB). This can impact web performance.
 Entrypoints:
-  index (1000 KiB)
+  index (959 KiB)
       ./style-index.css
       ./style-index-rtl.css
       index.css
       index.js
       index-rtl.css
       index.asset.php
-[39m[22m
 
-[1m[33mWARNING[39m[22m in [1mwebpack performance recommendations: 
+WARNING in webpack performance recommendations: 
 You can limit the size of your bundles by using import() or require.ensure to lazy load some parts of your application.
-For more info visit https://webpack.js.org/guides/code-splitting/[39m[22m
+For more info visit https://webpack.js.org/guides/code-splitting/
 
-webpack 5.106.2 compiled with [1m[33m6 warnings[39m[22m in 69055 ms
+webpack 5.106.2 compiled with 6 warnings in 17507 ms
