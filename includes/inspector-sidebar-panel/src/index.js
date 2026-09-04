@@ -23,6 +23,7 @@ import { useEntityProp } from '@wordpress/core-data';
 import {
 	CardDivider,
 	PanelBody,
+	Slot,
 	ToggleControl,
 	Modal,
 	Button,
@@ -76,15 +77,29 @@ function NewDataUploadModal({ onConfirmNewData, onConfirmSameData, onCancel }) {
 					marginTop: '16px',
 				}}
 			>
-				<Button variant="tertiary" onClick={onCancel}>
+				{/* eslint-disable prc/inspector-button-full-width -- modal actions sit in a row */}
+				<Button
+					__next40pxDefaultSize
+					variant="tertiary"
+					onClick={onCancel}
+				>
 					{__('Cancel', 'prc-datasets')}
 				</Button>
-				<Button variant="secondary" onClick={onConfirmSameData}>
+				<Button
+					__next40pxDefaultSize
+					variant="secondary"
+					onClick={onConfirmSameData}
+				>
 					{__('No, keep analytics as-is', 'prc-datasets')}
 				</Button>
-				<Button variant="primary" onClick={onConfirmNewData}>
+				<Button
+					__next40pxDefaultSize
+					variant="primary"
+					onClick={onConfirmNewData}
+				>
 					{__('Yes, this is new data', 'prc-datasets')}
 				</Button>
+				{/* eslint-enable prc/inspector-button-full-width */}
 			</div>
 		</Modal>
 	);
@@ -213,6 +228,7 @@ function DatasetOptionsPanel() {
 				</PanelBody>
 				<StatsPanel postId={postId} />
 				<AudiencePanel postId={postId} />
+				<Slot name="prc-datasets/options-after" bubblesVirtually />
 			</PluginSidebar>
 			<PluginPrePublishPanel>
 				<PanelBody title="Review Dataset Options">

@@ -41,6 +41,9 @@ class Rest_API {
 		$this->loader->add_action( 'updated_post_meta', $this, 'maybe_invalidate_stats_on_meta_change', 10, 4 );
 		$this->loader->add_action( 'added_post_meta', $this, 'maybe_invalidate_stats_on_meta_change', 10, 4 );
 		$this->loader->add_action( 'deleted_post_meta', $this, 'maybe_invalidate_stats_on_meta_delete', 10, 4 );
+		$this->loader->add_action( 'updated_post_meta', $this, 'maybe_protect_download_attachment', 10, 4 );
+		$this->loader->add_action( 'added_post_meta', $this, 'maybe_protect_download_attachment', 10, 4 );
+		$this->loader->add_filter( 'prc_user_accounts_can_grant_protected_file', $this, 'maybe_require_atp', 10, 4 );
 	}
 
 	/**
@@ -79,6 +82,8 @@ class Rest_API {
 	}
 
 	/**
+	 * Register dataset REST routes.
+	 *
 	 * @hook rest_api_init
 	 */
 	public function register_dataset_endpoints() {
@@ -94,9 +99,7 @@ class Rest_API {
 						'type'     => 'integer',
 					),
 				),
-				'permission_callback' => function ( WP_REST_Request $request ) {
-					return true;
-				},
+				'permission_callback' => '__return_true',
 			)
 		);
 		register_rest_route(
@@ -106,9 +109,7 @@ class Rest_API {
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'restfully_check_atp_acceptance' ),
 				'args'                => array(),
-				'permission_callback' => function ( WP_REST_Request $request ) {
-					return true;
-				},
+				'permission_callback' => '__return_true',
 			)
 		);
 		register_rest_route(
@@ -118,9 +119,7 @@ class Rest_API {
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'restfully_accept_atp' ),
 				'args'                => array(),
-				'permission_callback' => function ( WP_REST_Request $request ) {
-					return true;
-				},
+				'permission_callback' => '__return_true',
 			)
 		);
 		register_rest_route(
@@ -211,6 +210,22 @@ class Rest_API {
 				'permission_callback' => array( $this, 'can_edit_dataset_from_request' ),
 			)
 		);
+		register_rest_route(
+			'prc-api/v3',
+			'datasets/audience-jobs/(?P<job_id>ds_[a-z0-9]{13,32})',
+			array(
+				'methods'             => 'GET',
+				'callback'            => array( $this, 'restfully_get_audience_job' ),
+				'args'                => array(
+					'job_id' => array(
+						'required'          => true,
+						'type'              => 'string',
+						'sanitize_callback' => 'sanitize_key',
+					),
+				),
+				'permission_callback' => array( $this, 'can_access_audience_job' ),
+			)
+		);
 	}
 
 	/**
@@ -245,21 +260,65 @@ class Rest_API {
 	}
 
 	/**
-	 * POST datasets/build-audience
+	 * POST datasets/build-audience — start an async audience job.
 	 *
 	 * @param \WP_REST_Request $request Request.
 	 * @return \WP_REST_Response|\WP_Error
 	 */
 	public function restfully_build_audience( $request ) {
-		$dataset_id   = (int) $request->get_param( 'dataset_id' );
-		$verification = (string) ( $request->get_param( 'verification' ) ?: 'verified' );
+		$dataset_id         = (int) $request->get_param( 'dataset_id' );
+		$verification_param = $request->get_param( 'verification' );
+		$verification       = (string) ( $verification_param ? $verification_param : 'verified' );
 
-		$result = Audience_Service::build( $dataset_id, $verification );
+		$result = Audience_Service::start_job( $dataset_id, $verification );
 		if ( is_wp_error( $result ) ) {
 			return $result;
 		}
 
-		return rest_ensure_response( $result );
+		return new \WP_REST_Response( $result, 202 );
+	}
+
+	/**
+	 * GET datasets/audience-jobs/{job_id}
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return \WP_REST_Response|\WP_Error
+	 */
+	public function restfully_get_audience_job( $request ) {
+		if ( ! class_exists( '\PRC\Platform\Email_Builder\Audience_Job' ) ) {
+			return new \WP_Error(
+				'missing_email_builder',
+				'Email Builder is required to poll dataset audience jobs.',
+				array( 'status' => 500 )
+			);
+		}
+
+		$view = \PRC\Platform\Email_Builder\Audience_Job::status( (string) $request['job_id'] );
+		if ( is_wp_error( $view ) ) {
+			return $view;
+		}
+
+		return rest_ensure_response( $view );
+	}
+
+	/**
+	 * Whether the current user can poll the named dataset audience job.
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 */
+	public function can_access_audience_job( $request ): bool {
+		if ( ! class_exists( '\PRC\Platform\Email_Builder\Audience_Job' ) ) {
+			return false;
+		}
+		$job = get_option(
+			\PRC\Platform\Email_Builder\Audience_Job::job_option_key( (string) $request['job_id'] ),
+			null
+		);
+		if ( ! is_array( $job ) ) {
+			return current_user_can( 'edit_posts' );
+		}
+
+		return \PRC\Platform\Email_Builder\Audience_Job::current_user_can_access( $job );
 	}
 
 	/**
@@ -363,7 +422,7 @@ class Rest_API {
 		}
 
 		$id = (int) $id;
-		if ( Content_Type::$post_object_name !== get_post_type( $id ) ) {
+		if ( get_post_type( $id ) !== Content_Type::$post_object_name ) {
 			return new WP_Error(
 				'invalid_dataset',
 				'Post not found or is not a dataset.',
@@ -371,14 +430,39 @@ class Rest_API {
 			);
 		}
 
+		if ( ! class_exists( '\\PRC\\Platform\\User_Accounts\\User_Data' ) ) {
+			return new WP_Error( 'no_user_accounts', 'User Accounts class not found.', array( 'status' => 400 ) );
+		}
+
+		$user = new \PRC\Platform\User_Accounts\User_Data( $uid, $token );
+		if ( is_wp_error( $user->data ) ) {
+			return $user->data;
+		}
+
 		$resolved = self::resolve_download_file_url( $id, true );
 		if ( is_wp_error( $resolved ) ) {
 			return rest_ensure_response( $resolved );
 		}
 
-		$file_url = $resolved['file_url'];
+		$file_url      = $resolved['file_url'];
+		$attachment_id = $resolved['attachment_id'];
 
-		// Log the download.
+		if ( $attachment_id && class_exists( '\\PRC\\Platform\\User_Accounts\\Protected_Files' ) ) {
+			\PRC\Platform\User_Accounts\Protected_Files::protect( (int) $attachment_id );
+			$granted = \PRC\Platform\User_Accounts\Protected_Files::grant_for_user(
+				$user,
+				(int) $attachment_id,
+				array(
+					'source'     => 'dataset',
+					'dataset_id' => $id,
+				)
+			);
+			if ( is_wp_error( $granted ) ) {
+				return $granted;
+			}
+			$file_url = $granted['file_url'];
+		}
+
 		$this->increment_download_total( $id );
 		$this->log_monthly_download_count( $id );
 		$this->log_dataset_to_user( $uid, $id, $token );
@@ -445,11 +529,11 @@ class Rest_API {
 	/**
 	 * Get the download log for a dataset object.
 	 *
-	 * @param mixed $object The object.
+	 * @param mixed $dataset Dataset REST object.
 	 * @return array{total: int, log: array, daily: array, new_data_uploaded: string|null, splits: array}
 	 */
-	public function restfully_get_download_log( $object ) {
-		$post_id = (int) $object['id'];
+	public function restfully_get_download_log( $dataset ) {
+		$post_id = (int) $dataset['id'];
 
 		return self::get_download_stats( $post_id );
 	}
@@ -471,7 +555,7 @@ class Rest_API {
 			return new WP_Error( 'no_dataset_id', 'No dataset ID provided.', array( 'status' => 400 ) );
 		}
 
-		$return = array();
+		$return            = array();
 		$return['total']   = $this->increment_download_total( $id );
 		$return['monthly'] = $this->log_monthly_download_count( $id );
 		$return['uid']     = $this->log_dataset_to_user( $auth['uid'], $id, $auth['token'] );
@@ -496,11 +580,11 @@ class Rest_API {
 		}
 
 		$to_return = array(
-			'total'              => (int) get_post_meta( $dataset_id, '_total_downloads', true ),
-			'log'                => array(),
-			'daily'              => array(),
-			'new_data_uploaded'  => null,
-			'splits'             => array(),
+			'total'             => (int) get_post_meta( $dataset_id, '_total_downloads', true ),
+			'log'               => array(),
+			'daily'             => array(),
+			'new_data_uploaded' => null,
+			'splits'            => array(),
 		);
 
 		$start_year   = 2020;
@@ -540,10 +624,11 @@ class Rest_API {
 	 * @param mixed  $meta_value Meta value.
 	 */
 	public function maybe_invalidate_stats_on_meta_change( $meta_id, $object_id, $meta_key, $meta_value ): void {
+		unset( $meta_id, $meta_value );
 		if ( Content_Type::$new_data_uploaded_meta_key !== $meta_key ) {
 			return;
 		}
-		if ( Content_Type::$post_object_name !== get_post_type( $object_id ) ) {
+		if ( get_post_type( $object_id ) !== Content_Type::$post_object_name ) {
 			return;
 		}
 		self::invalidate_download_stats_cache( $object_id );
@@ -746,5 +831,115 @@ class Rest_API {
 
 		// Patch directly onto the user root, we replace datasets every time. In the future we could add a transformer to the get function that will get the titles and such so replacing is best.
 		return $user->patch_data( $new_datasets, 'datasets' );
+	}
+
+	/**
+	 * Mark a dataset download attachment as protected when editors attach it.
+	 *
+	 * @param int    $meta_id    Meta row ID.
+	 * @param int    $post_id    Post ID.
+	 * @param string $meta_key   Meta key.
+	 * @param mixed  $meta_value Meta value.
+	 */
+	public function maybe_protect_download_attachment( $meta_id, $post_id, $meta_key, $meta_value ): void {
+		unset( $meta_id );
+		if ( Content_Type::$download_meta_key !== $meta_key ) {
+			return;
+		}
+		if ( get_post_type( $post_id ) !== Content_Type::$post_object_name ) {
+			return;
+		}
+		if ( ! class_exists( '\\PRC\\Platform\\User_Accounts\\Protected_Files' ) ) {
+			return;
+		}
+		$attachment_id = absint( $meta_value );
+		if ( $attachment_id < 1 ) {
+			return;
+		}
+		\PRC\Platform\User_Accounts\Protected_Files::protect( $attachment_id );
+	}
+
+	/**
+	 * Extra grant gate: ATP datasets require acceptance on the Firebase user.
+	 *
+	 * @param true|WP_Error $allowed        Current grant decision.
+	 * @param int           $attachment_id  Attachment ID.
+	 * @param array         $context        Grant context.
+	 * @param mixed         $user           Authenticated User_Data instance.
+	 * @return true|WP_Error
+	 */
+	public function maybe_require_atp( $allowed, $attachment_id, $context, $user ) {
+		if ( is_wp_error( $allowed ) || true !== $allowed ) {
+			return $allowed;
+		}
+		$dataset_id = isset( $context['dataset_id'] ) ? absint( $context['dataset_id'] ) : 0;
+		if ( $dataset_id < 1 ) {
+			$dataset_id = $this->atp_dataset_id_for_attachment( (int) $attachment_id );
+		}
+		if ( $dataset_id < 1 ) {
+			return $allowed;
+		}
+		if ( ! get_post_meta( $dataset_id, Content_Type::$atp_legal_key, true ) ) {
+			return $allowed;
+		}
+		if ( ! $user instanceof \PRC\Platform\User_Accounts\User_Data ) {
+			return new WP_Error(
+				'atp_required',
+				'ATP acceptance is required to download this dataset.',
+				array( 'status' => 403 )
+			);
+		}
+		if ( true !== $user->check_atp() ) {
+			return new WP_Error(
+				'atp_required',
+				'ATP acceptance is required to download this dataset.',
+				array( 'status' => 403 )
+			);
+		}
+		return true;
+	}
+
+	/**
+	 * ATP dataset ID that uses this attachment, if any.
+	 *
+	 * Used when the generic grant omits dataset_id so ATP cannot be skipped
+	 * by POSTing a dataset attachment ID to protected-files/download.
+	 *
+	 * @param int $attachment_id Attachment post ID.
+	 * @return int Dataset post ID, or 0.
+	 */
+	private function atp_dataset_id_for_attachment( int $attachment_id ): int {
+		if ( $attachment_id < 1 ) {
+			return 0;
+		}
+
+		$query = new \WP_Query(
+			array(
+				'post_type'              => Content_Type::$post_object_name,
+				'post_status'            => 'any',
+				'fields'                 => 'ids',
+				'posts_per_page'         => 20,
+				'no_found_rows'          => true,
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
+				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- grant-time ATP lookup; bounded to 20 IDs.
+				'meta_query'             => array(
+					array(
+						'key'   => Content_Type::$download_meta_key,
+						'value' => $attachment_id,
+					),
+				),
+			)
+		);
+
+		$ids = is_array( $query->posts ) ? $query->posts : array();
+		foreach ( $ids as $dataset_id ) {
+			$dataset_id = (int) $dataset_id;
+			if ( get_post_meta( $dataset_id, Content_Type::$atp_legal_key, true ) ) {
+				return $dataset_id;
+			}
+		}
+
+		return 0;
 	}
 }

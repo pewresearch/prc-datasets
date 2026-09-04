@@ -1,5 +1,4 @@
 <?php
-declare(strict_types=1);
 /**
  * WP-CLI command: wp prc datasets build-audience
  *
@@ -8,6 +7,8 @@ declare(strict_types=1);
  *
  * @package PRC\Platform\Datasets
  */
+
+declare(strict_types=1);
 
 namespace PRC\Platform\Datasets;
 
@@ -80,19 +81,23 @@ class CLI_Build_Audience extends WP_CLI_Command {
 
 		$dataset = get_post( $dataset_id );
 		if ( ! $dataset || Content_Type::$post_object_name !== $dataset->post_type ) {
-			WP_CLI::error( sprintf(
-				'Post %d does not exist or is not a "%s" post type.',
-				$dataset_id,
-				Content_Type::$post_object_name
-			) );
+			WP_CLI::error(
+				sprintf(
+					'Post %d does not exist or is not a "%s" post type.',
+					$dataset_id,
+					Content_Type::$post_object_name
+				)
+			);
 		}
 
-		WP_CLI::line( sprintf(
-			'Calling buildDatasetAudience for dataset %d ("%s", verification=%s)…',
-			$dataset_id,
-			$dataset->post_title,
-			$verification
-		) );
+		WP_CLI::line(
+			sprintf(
+				'Starting dataset downloaders audience job for dataset %d ("%s", verification=%s)…',
+				$dataset_id,
+				$dataset->post_title,
+				$verification
+			)
+		);
 
 		$result = Audience_Service::build(
 			$dataset_id,
@@ -108,13 +113,15 @@ class CLI_Build_Audience extends WP_CLI_Command {
 		}
 
 		$stats = $result['stats'] ?? array();
-		WP_CLI::line( sprintf(
-			'Scanned %s users → %s matched → %s email(s) (%s).',
-			number_format( (int) ( $stats['scanned'] ?? $result['scanned'] ?? 0 ) ),
-			number_format( (int) ( $stats['matched'] ?? $result['matched'] ?? 0 ) ),
-			number_format( (int) ( $result['count'] ?? 0 ) ),
-			$result['verification'] ?? $verification
-		) );
+		WP_CLI::line(
+			sprintf(
+				'Scanned %s users → %s matched → %s email(s) (%s).',
+				number_format( (int) ( $stats['scanned'] ?? $result['scanned'] ?? 0 ) ),
+				number_format( (int) ( $stats['matched'] ?? $result['matched'] ?? 0 ) ),
+				number_format( (int) ( $result['count'] ?? 0 ) ),
+				$result['verification'] ?? $verification
+			)
+		);
 
 		if ( $dry_run ) {
 			WP_CLI::success( 'Dry-run complete. No data written.' );
@@ -125,11 +132,13 @@ class CLI_Build_Audience extends WP_CLI_Command {
 		WP_CLI::line( sprintf( 'Audience saved → option key: %s', $audience_key ) );
 
 		if ( $no_create_post ) {
-			WP_CLI::success( sprintf(
-				'Done. Audience option: %s  |  %s email(s)',
-				$audience_key,
-				number_format( (int) $result['count'] )
-			) );
+			WP_CLI::success(
+				sprintf(
+					'Done. Audience option: %s  |  %s email(s)',
+					$audience_key,
+					number_format( (int) $result['count'] )
+				)
+			);
 			return;
 		}
 
@@ -138,11 +147,13 @@ class CLI_Build_Audience extends WP_CLI_Command {
 				'The "prc_email_txn" post type is not registered. ' .
 				'Ensure prc-email-builder is active. Skipping post creation.'
 			);
-			WP_CLI::success( sprintf(
-				'Done. Audience option: %s  |  %s email(s)',
-				$audience_key,
-				number_format( (int) $result['count'] )
-			) );
+			WP_CLI::success(
+				sprintf(
+					'Done. Audience option: %s  |  %s email(s)',
+					$audience_key,
+					number_format( (int) $result['count'] )
+				)
+			);
 			return;
 		}
 
@@ -177,11 +188,13 @@ class CLI_Build_Audience extends WP_CLI_Command {
 			WP_CLI::line( sprintf( 'Newsletter draft created → %s', $edit_url ) );
 		}
 
-		WP_CLI::success( sprintf(
-			'Done. Audience option: %s  |  %s email(s)',
-			$audience_key,
-			number_format( (int) $result['count'] )
-		) );
+		WP_CLI::success(
+			sprintf(
+				'Done. Audience option: %s  |  %s email(s)',
+				$audience_key,
+				number_format( (int) $result['count'] )
+			)
+		);
 	}
 }
 

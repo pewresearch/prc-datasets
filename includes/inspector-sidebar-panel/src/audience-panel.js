@@ -2,11 +2,13 @@
  * Dataset audience panel — wires AudienceBuildPanel to datasets REST.
  */
 
-import { useCallback, useEffect, useState } from '@wordpress/element';
+import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { AudienceBuildPanel } from '@prc/components';
+
+const JOB_POLL_MS = 4000;
 
 /**
  * Normalize a REST audience row into the shared snapshot shape.
@@ -26,6 +28,10 @@ function normalizeAudience(row) {
 	};
 }
 
+function getErrorMessage(error) {
+	return error?.message || __('Audience build failed.', 'prc-datasets');
+}
+
 /**
  * @param {Object} props
  * @param {number} props.postId Dataset post ID.
@@ -33,13 +39,17 @@ function normalizeAudience(row) {
 export default function AudiencePanel({ postId }) {
 	const [audiences, setAudiences] = useState([]);
 	const [status, setStatus] = useState(
-		/** @type {'idle' | 'loading' | 'building' | 'deleting' | 'error'} */ (
+		/** @type {'idle' | 'loading' | 'queued' | 'scanning' | 'deleting' | 'error'} */ (
 			'loading'
 		)
 	);
 	const [errorMessage, setErrorMessage] = useState(
 		/** @type {string|null} */ (null)
 	);
+	const [jobStats, setJobStats] = useState(
+		/** @type {{ scanned?: number|null, matched?: number|null }} */ ({})
+	);
+	const pollToken = useRef(0);
 
 	const loadAudiences = useCallback(async () => {
 		if (!postId) {
@@ -71,10 +81,12 @@ export default function AudiencePanel({ postId }) {
 
 	const runBuild = useCallback(
 		async ({ verification }) => {
-			setStatus('building');
+			const token = ++pollToken.current;
+			setStatus('queued');
 			setErrorMessage(null);
+			setJobStats({});
 			try {
-				await apiFetch({
+				let view = await apiFetch({
 					path: '/prc-api/v3/datasets/build-audience',
 					method: 'POST',
 					data: {
@@ -82,12 +94,40 @@ export default function AudiencePanel({ postId }) {
 						verification,
 					},
 				});
+				while (
+					token === pollToken.current &&
+					(view?.phase === 'queued' || view?.phase === 'scanning')
+				) {
+					setStatus(view.phase);
+					setJobStats({
+						scanned: view.scannedUsers ?? null,
+						matched: view.matchedUsers ?? null,
+					});
+					await new Promise((resolve) =>
+						window.setTimeout(resolve, JOB_POLL_MS)
+					);
+					if (token !== pollToken.current) {
+						return;
+					}
+					view = await apiFetch({
+						path: `/prc-email-builder/v1/audience-jobs/${view.jobId}`,
+					});
+				}
+				if (token !== pollToken.current) {
+					return;
+				}
+				if (view?.phase === 'failed') {
+					throw new Error(
+						view.error?.message ||
+							__('Audience build failed.', 'prc-datasets')
+					);
+				}
 				await loadAudiences();
 			} catch (error) {
-				setErrorMessage(
-					error?.message ||
-						__('Audience build failed.', 'prc-datasets')
-				);
+				if (token !== pollToken.current) {
+					return;
+				}
+				setErrorMessage(getErrorMessage(error));
 				setStatus('error');
 			}
 		},
@@ -127,12 +167,13 @@ export default function AudiencePanel({ postId }) {
 		>
 			<AudienceBuildPanel
 				helpText={__(
-					'Build a Mandrill recipient list from users who downloaded this dataset. The list is saved for transactional email; no draft email is created here.',
+					'Build a Mandrill recipient list from users who downloaded this dataset. You can leave this screen while a build runs. The list is saved for transactional email; no draft email is created here.',
 					'prc-datasets'
 				)}
 				audiences={audiences}
 				status={status}
 				errorMessage={errorMessage}
+				jobStats={jobStats}
 				onBuild={runBuild}
 				onRebuild={runBuild}
 				onDelete={runDelete}

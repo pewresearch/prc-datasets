@@ -220,6 +220,11 @@ class Plugin {
 		new Admin_Filter( $this->get_loader() );
 		new Dataset_List( $this->get_loader() );
 
+		add_action(
+			'prc_email_builder_register_audience_builders',
+			array( Audience_Service::class, 'register_builder' )
+		);
+
 		// Defer until plugins_loaded: prc-datasets loads alphabetically before
 		// prc-markdown-for-agents, so LLMs_Txt is not defined at bootstrap time.
 		$this->loader->add_action( 'plugins_loaded', $this, 'maybe_register_llms_txt_section' );
@@ -336,10 +341,16 @@ class Plugin {
 			true
 		);
 
+		$style_deps = array();
+		if ( in_array( 'prc-components', $asset_file['dependencies'], true ) ) {
+			wp_enqueue_style( 'prc-components' );
+			$style_deps[] = 'prc-components';
+		}
+
 		wp_enqueue_style(
 			$asset_slug,
 			$style_src,
-			array(),
+			$style_deps,
 			$asset_file['version']
 		);
 	}

@@ -13,6 +13,7 @@ import {
 	AnalyticsPeriodControls,
 	CalendarHeatmap,
 	MONTH_LABELS,
+	monthKeyFromIndex,
 } from '@prc/components';
 
 import './stats-panel.scss';
@@ -148,6 +149,19 @@ export default function StatsPanel({ postId, embedded = false }) {
 				>
 					<CalendarHeatmap
 						values={monthData.map((m) => m.total)}
+						onCellClick={(index) => {
+							setSelectedMonth(monthKeyFromIndex(index));
+						}}
+						getCellAriaLabel={(_, index) =>
+							sprintf(
+								/* translators: %s: month abbreviation */
+								__(
+									'View daily downloads for %s',
+									'prc-datasets'
+								),
+								MONTH_LABELS[index]
+							)
+						}
 						renderValue={(_, index) => {
 							const item = monthData[index];
 							if (item?.split) {
