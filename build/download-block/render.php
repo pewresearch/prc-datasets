@@ -1,17 +1,28 @@
 <?php
+/**
+ * Server render for the dataset download block.
+ *
+ * @package PRC\Platform\Datasets
+ */
+
 namespace PRC\Platform\Datasets;
 
 wp_enqueue_script( 'wp-url' );
 wp_enqueue_script( 'wp-api-fetch' );
 wp_enqueue_script( 'firebase' );
 
-// Assume this is a singular dataset post
+// Assume this is a singular dataset post.
 $dataset_id = get_the_ID();
 // But, usually, we're going to be viewing these from the perspective of the datasets taxonomy archive, so use that to get the dataset id.
 if ( is_tax( 'datasets' ) ) {
-	$dataset_term_id = get_queried_object_id();
-	$dataset         = \PRC\TDS\get_related_post( $dataset_term_id, 'datasets' );
-	$dataset_id      = $dataset->ID;
+	$dataset = \PRC\TDS\get_related_post( get_queried_object_id(), 'datasets' );
+	if ( ! $dataset instanceof \WP_Post ) {
+		return;
+	}
+	$dataset_id = $dataset->ID;
+}
+if ( 'dataset' !== get_post_type( $dataset_id ) ) {
+	return;
 }
 $is_atp = get_post_meta( $dataset_id, 'is_atp', true );
 // If this dataset is in the ATP then it needs a modal to accept the ATP legal terms. Here we're manually adding the content from the download block... usually a core/button into the trigger of the poopup. Now, the button is still wired to the download block but the download block can handle opening the modal by accessing the modals' action store when running core/button::onButtonClick.
@@ -52,6 +63,6 @@ $block_wrapper_attrs = get_block_wrapper_attributes(
 
 echo wp_sprintf(
 	'<div %1$s>%2$s</div>',
-	$block_wrapper_attrs,
-	$content, // If this is ATP then this will be a modal
+	$block_wrapper_attrs, // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- get_block_wrapper_attributes().
+	$content // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- block inner HTML; ATP modal when present.
 );
