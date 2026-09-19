@@ -148,6 +148,11 @@ class Plugin {
 		require_once plugin_dir_path( __DIR__ ) . 'includes/class-audience-service.php';
 
 		/**
+		 * Shared frontend render helpers for dataset download blocks.
+		 */
+		require_once plugin_dir_path( __DIR__ ) . 'includes/render-dataset-download.php';
+
+		/**
 		 * The class responsible for CLI commands.
 		 */
 		require_once plugin_dir_path( __DIR__ ) . 'includes/class-cli.php';
@@ -316,6 +321,7 @@ class Plugin {
 		);
 		register_block_type_from_metadata( plugin_dir_path( __DIR__ ) . 'build/dataset-atp-legal-acceptance-block' );
 		register_block_type_from_metadata( plugin_dir_path( __DIR__ ) . 'build/download-block' );
+		register_block_type_from_metadata( plugin_dir_path( __DIR__ ) . 'build/download-button-block' );
 	}
 
 	/**

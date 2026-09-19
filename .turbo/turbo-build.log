@@ -1,21 +1,20 @@
 
-> @prc/datasets@1.4.1 build
+> @prc/datasets@1.5.0 build
 > npm run build:blocks && npm run build:inspector-panel && npm run build:admin-dataview
 
 
-> @prc/datasets@1.4.1 build:blocks
+> @prc/datasets@1.5.0 build:blocks
 > wp-scripts build --experimental-modules --webpack-copy-php && wp-scripts build-blocks-manifest
 
-assets by path [1m[32mdownload-block/[39m[22m 7.77 KiB
-  assets by path [1m[32mdownload-block/*.php[39m[22m 2.61 KiB 2 assets
+assets by path [1m[32mdownload-button-block/[39m[22m 7.7 KiB 6 assets
+assets by path [1m[32mdownload-block/[39m[22m 6.18 KiB
+  assets by chunk 2.47 KiB (name: download-block/index) 2 assets
   assets by path [1m[32mdownload-block/*.css[39m[22m 2.13 KiB 2 assets
-  asset [1m[32mdownload-block/index.js[39m[22m 2.29 KiB [1m[32m[emitted][39m[22m [1m[32m[minimized][39m[22m (name: download-block/index)
-  asset [1m[32mdownload-block/block.json[39m[22m 752 bytes [1m[32m[emitted][39m[22m [from: src/download-block/block.json] [1m[32m[copied][39m[22m
+  + 2 assets
 assets by path [1m[32mdataset-atp-legal-acceptance-block/[39m[22m 4.43 KiB
   assets by chunk 2.11 KiB (name: dataset-atp-legal-acceptance-block/index) 2 assets
   assets by chunk 638 bytes (id hint: style) 2 assets
-  asset [1m[32mdataset-atp-legal-acceptance-block/render.php[39m[22m 1.08 KiB [1m[32m[emitted][39m[22m [from: src/dataset-atp-legal-acceptance-block/render.php] [1m[32m[copied][39m[22m
-  asset [1m[32mdataset-atp-legal-acceptance-block/block.json[39m[22m 644 bytes [1m[32m[emitted][39m[22m [from: src/dataset-atp-legal-acceptance-block/block.json] [1m[32m[copied][39m[22m
+  + 2 assets
 assets by path [1m[32mdataset-description-block/[39m[22m 966 bytes
   asset [1m[32mdataset-description-block/index.js[39m[22m 516 bytes [1m[32m[emitted][39m[22m [1m[32m[minimized][39m[22m (name: dataset-description-block/index)
   asset [1m[32mdataset-description-block/block.json[39m[22m 340 bytes [1m[32m[emitted][39m[22m [from: src/dataset-description-block/block.json] [1m[32m[copied][39m[22m
@@ -23,33 +22,41 @@ assets by path [1m[32mdataset-description-block/[39m[22m 966 bytes
 Entrypoint [1mdataset-atp-legal-acceptance-block/index[39m[22m 2.73 KiB = [1m[32mdataset-atp-legal-acceptance-block/style-index.css[39m[22m 319 bytes [1m[32mdataset-atp-legal-acceptance-block/style-index-rtl.css[39m[22m 319 bytes [1m[32mdataset-atp-legal-acceptance-block/index.js[39m[22m 1.96 KiB [1m[32mdataset-atp-legal-acceptance-block/index.asset.php[39m[22m 152 bytes
 Entrypoint [1mdataset-description-block/index[39m[22m 626 bytes = [1m[32mdataset-description-block/index.js[39m[22m 516 bytes [1m[32mdataset-description-block/index.asset.php[39m[22m 110 bytes
 Entrypoint [1mdownload-block/index[39m[22m 4.61 KiB = [1m[32mdownload-block/style-index.css[39m[22m 1.07 KiB [1m[32mdownload-block/style-index-rtl.css[39m[22m 1.07 KiB [1m[32mdownload-block/index.js[39m[22m 2.29 KiB [1m[32mdownload-block/index.asset.php[39m[22m 183 bytes
-orphan modules 220 KiB (javascript) 1.83 KiB (runtime) [1m[33m[orphan][39m[22m 342 modules
-runtime modules 5 KiB 6 modules
-built modules 8.8 KiB (javascript) 1.38 KiB (css/mini-extract) [1m[33m[built][39m[22m
-  javascript modules 8.8 KiB
+Entrypoint [1mdownload-button-block/index[39m[22m 6.18 KiB = [1m[32mdownload-button-block/style-index.css[39m[22m 967 bytes [1m[32mdownload-button-block/style-index-rtl.css[39m[22m 968 bytes [1m[32mdownload-button-block/index.js[39m[22m 4.05 KiB [1m[32mdownload-button-block/index.asset.php[39m[22m 245 bytes
+orphan modules 228 KiB (javascript) 2.75 KiB (runtime) [1m[33m[orphan][39m[22m 358 modules
+runtime modules 7.5 KiB 9 modules
+built modules 17.4 KiB (javascript) 2.32 KiB (css/mini-extract) [1m[33m[built][39m[22m
+  javascript modules 17.4 KiB
     [1m./src/dataset-atp-legal-acceptance-block/index.js + 7 modules[39m[22m 3.13 KiB [1m[31m[not cacheable][39m[22m [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
     [1m./src/dataset-description-block/index.js + 3 modules[39m[22m 915 bytes [1m[31m[not cacheable][39m[22m [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
     [1m./src/download-block/index.js + 10 modules[39m[22m 4.78 KiB [1m[31m[not cacheable][39m[22m [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-  cacheable modules 1.38 KiB
+    [1m./src/download-button-block/index.js + 16 modules[39m[22m 8.61 KiB [1m[31m[not cacheable][39m[22m [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+  cacheable modules 2.32 KiB
     css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]![1m./src/dataset-atp-legal-acceptance-block/style.scss[39m[22m 318 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
     css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]![1m./src/download-block/style.scss[39m[22m 1.06 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-webpack 5.106.2 compiled [1m[32msuccessfully[39m[22m in 1359 ms
+    css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]![1m./src/download-button-block/style.scss[39m[22m 966 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+webpack 5.106.2 compiled [1m[32msuccessfully[39m[22m in 1983 ms
 
 assets by path [1m[32mdataset-atp-legal-acceptance-block/[39m[22m 8.36 KiB
   asset [1m[32mdataset-atp-legal-acceptance-block/view.js[39m[22m 8.23 KiB [1m[32m[emitted][39m[22m [javascript module] [1m[32m[minimized][39m[22m (name: dataset-atp-legal-acceptance-block/view)
   asset [1m[32mdataset-atp-legal-acceptance-block/view.asset.php[39m[22m 130 bytes [1m[32m[emitted][39m[22m (name: dataset-atp-legal-acceptance-block/view)
+assets by path [1m[32mdownload-button-block/[39m[22m 1.79 KiB
+  asset [1m[32mdownload-button-block/view.js[39m[22m 1.66 KiB [1m[32m[emitted][39m[22m [javascript module] [1m[32m[minimized][39m[22m (name: download-button-block/view)
+  asset [1m[32mdownload-button-block/view.asset.php[39m[22m 130 bytes [1m[32m[emitted][39m[22m (name: download-button-block/view)
 assets by path [1m[32mdownload-block/[39m[22m 1.65 KiB
   asset [1m[32mdownload-block/view.js[39m[22m 1.52 KiB [1m[32m[emitted][39m[22m [javascript module] [1m[32m[minimized][39m[22m (name: download-block/view)
   asset [1m[32mdownload-block/view.asset.php[39m[22m 130 bytes [1m[32m[emitted][39m[22m (name: download-block/view)
 Entrypoint [1mdataset-atp-legal-acceptance-block/view[39m[22m 8.36 KiB = [1m[32mdataset-atp-legal-acceptance-block/view.js[39m[22m 8.23 KiB [1m[32mdataset-atp-legal-acceptance-block/view.asset.php[39m[22m 130 bytes
 Entrypoint [1mdownload-block/view[39m[22m 1.65 KiB = [1m[32mdownload-block/view.js[39m[22m 1.52 KiB [1m[32mdownload-block/view.asset.php[39m[22m 130 bytes
+Entrypoint [1mdownload-button-block/view[39m[22m 1.79 KiB = [1m[32mdownload-button-block/view.js[39m[22m 1.66 KiB [1m[32mdownload-button-block/view.asset.php[39m[22m 130 bytes
 orphan modules 42 bytes [1m[33m[orphan][39m[22m 1 module
 [1m./src/dataset-atp-legal-acceptance-block/view.js + 1 modules[39m[22m 8.9 KiB [1m[31m[not cacheable][39m[22m [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+[1m./src/download-button-block/view.js[39m[22m 100 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
 [1m./src/download-block/view.js + 1 modules[39m[22m 3.41 KiB [1m[31m[not cacheable][39m[22m [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-webpack 5.106.2 compiled [1m[32msuccessfully[39m[22m in 742 ms
+webpack 5.106.2 compiled [1m[32msuccessfully[39m[22m in 1142 ms
 Block metadata PHP file generated at: build/blocks-manifest.php
 
-> @prc/datasets@1.4.1 build:inspector-panel
+> @prc/datasets@1.5.0 build:inspector-panel
 > wp-scripts build --source-path=includes/inspector-sidebar-panel/src --output-path=includes/inspector-sidebar-panel/build
 
 assets by path [1m[32m*.css[39m[22m 152 bytes
@@ -63,9 +70,9 @@ runtime modules 663 bytes 3 modules
 built modules 19.2 KiB (javascript) 75 bytes (css/mini-extract) [1m[33m[built][39m[22m
   [1m./includes/inspector-sidebar-panel/src/index.js + 18 modules[39m[22m 19.2 KiB [1m[31m[not cacheable][39m[22m [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
   css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]![1m./includes/inspector-sidebar-panel/src/stats-panel.scss[39m[22m 75 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-webpack 5.106.2 compiled [1m[32msuccessfully[39m[22m in 1486 ms
+webpack 5.106.2 compiled [1m[32msuccessfully[39m[22m in 1607 ms
 
-> @prc/datasets@1.4.1 build:admin-dataview
+> @prc/datasets@1.5.0 build:admin-dataview
 > wp-scripts build --config webpack.admin-dataview.config.js
 
 assets by chunk 152 KiB (name: index)
@@ -78,7 +85,7 @@ assets by path [1m[32m./*.css[39m[22m 367 KiB
   asset [1m[32m./style-index-rtl.css[39m[22m 183 KiB [1m[32m[emitted][39m[22m (name: ./style-index) (id hint: style)
   asset [1m[32m./style-index.css[39m[22m 183 KiB [1m[32m[emitted][39m[22m (name: ./style-index) (id hint: style)
 Entrypoint [1mindex[39m[22m [1m[33m[big][39m[22m 519 KiB = 6 assets
-orphan modules 11.2 MiB (javascript) 6.41 KiB (runtime) [1m[33m[orphan][39m[22m 5667 modules
+orphan modules 7.88 MiB (javascript) 6.41 KiB (runtime) [1m[33m[orphan][39m[22m 4085 modules
 runtime modules 3.33 KiB 6 modules
 built modules 668 KiB (javascript) 185 KiB (css/mini-extract) [1m[33m[built][39m[22m
   modules by path [1m../[39m[22m 83.9 KiB (javascript) 185 KiB (css/mini-extract)
@@ -109,4 +116,4 @@ Entrypoints:
 You can limit the size of your bundles by using import() or require.ensure to lazy load some parts of your application.
 For more info visit https://webpack.js.org/guides/code-splitting/[39m[22m
 
-webpack 5.106.2 compiled with [1m[33m2 warnings[39m[22m in 12247 ms
+webpack 5.106.2 compiled with [1m[33m2 warnings[39m[22m in 10488 ms

@@ -66,5 +66,42 @@ return array(
 		'style' => 'file:./style-index.css',
 		'render' => 'file:./render.php',
 		'viewScriptModule' => 'file:./view.js'
+	),
+	'download-button-block' => array(
+		'$schema' => 'https://schemas.wp.org/trunk/block.json',
+		'apiVersion' => 3,
+		'name' => 'prc-platform/dataset-download-button',
+		'version' => '1.0.0',
+		'title' => 'Dataset Download Button',
+		'category' => 'theme',
+		'description' => 'Wraps a button that downloads a selected dataset after the visitor signs in.',
+		'attributes' => array(
+			'datasetId' => array(
+				'type' => 'number'
+			),
+			'interactiveNamespace' => array(
+				'type' => 'string',
+				'default' => 'prc-platform/dataset-download'
+			)
+		),
+		'supports' => array(
+			'anchor' => true,
+			'html' => false,
+			'spacing' => array(
+				'blockGap' => true,
+				'margin' => true,
+				'padding' => true,
+				'__experimentalDefaultControls' => array(
+					'padding' => true,
+					'margin' => true
+				)
+			),
+			'interactivity' => true
+		),
+		'textdomain' => 'dataset-download-button',
+		'editorScript' => 'file:./index.js',
+		'style' => 'file:./style-index.css',
+		'render' => 'file:./render.php',
+		'viewScriptModule' => 'file:./view.js'
 	)
 );

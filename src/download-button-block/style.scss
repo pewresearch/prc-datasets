@@ -1,0 +1,24 @@
+.wp-block-prc-platform-dataset-download-button {
+	padding: 0;
+}
+.is-logged-in .wp-block-prc-platform-dataset-download-button,
+.wp-block.wp-block-prc-platform-dataset-download-button {
+	padding-top: 1em;
+	padding-left: 1em;
+	.wp-element-button {
+		&.is-processing {
+			opacity: 0.5;
+			transition: opacity 0.3s;
+		}
+		&.is-error {
+			background-color: var(--wp--preset--color--ui-error);
+			transition: background-color 0.3s;
+			color: #fff;
+		}
+		&.is-success {
+			background-color: var(--wp--preset--color--ui-success);
+			transition: background-color 0.3s;
+			color: #fff;
+		}
+	}
+}

@@ -16,7 +16,7 @@ Manages the `dataset` post type and `datasets` taxonomy as a linked pair (via [`
 - Includes datasets in sitewide search results and ElasticPress-backed archive faceting.
 - Injects dataset terms into `prc_platform_post_report_package_materials` so datasets appear in report package sidebars.
 - Block editor sidebar panel (`Dataset Options`) for uploading the download file, toggling the ATP flag, viewing the monthly download heatmap, and managing downloader audiences.
-- Three Gutenberg blocks and one block bindings source (see below).
+- Four Gutenberg blocks and one block bindings source (see below).
 - **DataViews admin list** — `Datasets > All Datasets` (`prc-datasets-library`) registers on the shared `@prc/wp-admin-dataview` shell. Rows expose `hasZip`, `downloadUnavailable`, `totalDownloads`, and `isAtp` columns; ZIP-status and download-unavailable filters map to `_download_attachment_id` and `_download_unavailable` meta. Provider assets live in `build/admin-dataview/`.
 
 ## Key files
@@ -35,17 +35,20 @@ Manages the `dataset` post type and `datasets` taxonomy as a linked pair (via [`
 | `includes/inspector-sidebar-panel/src/index.js`          | Editor sidebar plugin — file upload (`MediaDropZone`), new-data confirm modal, ATP toggle, pre-publish panel, `prc-datasets/options-after` slot              |
 | `includes/inspector-sidebar-panel/src/stats-panel.js`    | Download heatmap with year/month selectors, day drill-down, and new-data before/after split                                                                  |
 | `includes/inspector-sidebar-panel/src/audience-panel.js` | Downloader audience Generate / Rebuild / Delete via `AudienceBuildPanel`                                                                                     |
+| `includes/render-dataset-download.php`                   | Shared ATP + Interactivity render helper used by both download blocks                                                                                        |
 | `build/download-block/`                                  | `prc-platform/dataset-download` block — interactive download button                                                                                          |
+| `build/download-button-block/`                           | `prc-platform/dataset-download-button` block — editor-picked dataset + inner `core/button`                                                                   |
 | `build/dataset-atp-legal-acceptance-block/`              | `prc-platform/dataset-atp-legal-acceptance` block — ATP opt-in form                                                                                          |
 | `build/dataset-description-block/`                       | `prc-platform/dataset-description` block — editor-only block that pulls post content via block bindings                                                      |
 
 ## Blocks
 
-| Block name                                  | Description                                                                                                                                                                                                              |
-| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `prc-platform/dataset-download`             | Renders the download button. Uses the Interactivity API for the client-side download flow (Firebase auth headers, ATP gate check, file URL resolution). Dynamic (`render.php`).                                          |
-| `prc-platform/dataset-atp-legal-acceptance` | Renders the ATP terms acceptance form. Injected automatically by the download block when a dataset is ATP-restricted and the user has not yet accepted. Not directly insertable.                                         |
-| `prc-platform/dataset-description`          | Editor-only. Registers a block bindings source (`prc-platform/dataset-description`) that pulls `post_content` from the related `dataset` post into a `core/paragraph` block on taxonomy archive or single-dataset pages. |
+| Block name                                  | Description                                                                                                                                                                                                                                 |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `prc-platform/dataset-download`             | Renders the download button for the current dataset post or `datasets` taxonomy archive. Uses the Interactivity API for the client-side download flow (Firebase auth headers, ATP gate check, file URL resolution). Dynamic (`render.php`). |
+| `prc-platform/dataset-download-button`      | Editor-picked dataset download. Search for a `dataset` post, wrap a `core/button`, and auto-wrap in Content Gate on the frontend so logged-out visitors see the login form. Same download REST + logging path as `dataset-download`.        |
+| `prc-platform/dataset-atp-legal-acceptance` | Renders the ATP terms acceptance form. Injected automatically by the download block when a dataset is ATP-restricted and the user has not yet accepted. Not directly insertable.                                                            |
+| `prc-platform/dataset-description`          | Editor-only. Registers a block bindings source (`prc-platform/dataset-description`) that pulls `post_content` from the related `dataset` post into a `core/paragraph` block on taxonomy archive or single-dataset pages.                    |
 
 ## REST API endpoints
 
