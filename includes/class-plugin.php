@@ -278,7 +278,7 @@ class Plugin {
 		}
 		$dataset_id = get_the_ID();
 		if ( is_tax( Content_Type::$taxonomy_object_name ) ) {
-			$dataset = \PRC\TDS\get_related_post( get_queried_object_id(), 'datasets' );
+			$dataset = \PRC\Primitives\TDS\get_related_post( get_queried_object_id(), 'datasets' );
 			if ( ! $dataset instanceof \WP_Post ) {
 				return '';
 			}

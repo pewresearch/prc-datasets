@@ -2,11 +2,11 @@
 
 > Canonical docs: [docs/plugins/prc-datasets/](../../docs/plugins/prc-datasets/)
 
-Manages the `dataset` post type and `datasets` taxonomy as a linked pair (via [`prc/term-data-store`](https://github.com/pewresearch/term-data-store), namespace `PRC\TDS`), providing a digital-rights-management layer for file downloads, an ATP legal-acceptance gate, download telemetry, and newsletter audience building via Firebase Cloud Functions.
+Manages the `dataset` post type and `datasets` taxonomy as a linked pair (via the `prc/primitives` term data store, namespace `PRC\Primitives\TDS`), providing a digital-rights-management layer for file downloads, an ATP legal-acceptance gate, download telemetry, and newsletter audience building via Firebase Cloud Functions.
 
 ## What it does
 
-- Registers the `dataset` CPT and `datasets` taxonomy and binds them via `prc/term-data-store` so each taxonomy term has a corresponding post that holds the content and metadata.
+- Registers the `dataset` CPT and `datasets` taxonomy and binds them via the `prc/primitives` term data store so each taxonomy term has a corresponding post that holds the content and metadata.
 - Adds `prc-datasets` post type support to `post`, `feature`, and `chart` so those post types can be tagged with dataset terms.
 - Gated downloads — resolves the download file URL (media library attachment or legacy `dataset_download_url` meta) only after verifying Firebase identity (`X-PRC-User-Id` / `X-PRC-User-Token` headers) and per-IP rate limiting on `get-download`. Page-baked WordPress nonces are not used (they expire on edge-cached pages). A failed public resolve stamps `_download_unavailable` so editors can filter those datasets in DataViews.
 - ATP (American Trends Panel) legal gate — marks individual datasets as ATP-restricted; users must accept the ATP Terms of Service before a download URL is returned.
@@ -21,25 +21,25 @@ Manages the `dataset` post type and `datasets` taxonomy as a linked pair (via [`
 
 ## Key files
 
-| File                                                     | Purpose                                                                                                                                                      |
-| -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `includes/class-content-type.php`                        | CPT/taxonomy registration, `prc/term-data-store` relationship, meta field registration, rewrite rules, research team URL config, search/EP archive inclusion |
-| `includes/class-dataset-list.php`                        | DataViews admin list registration, row shaping, and ZIP / download-unavailable filters                                                                       |
-| `includes/class-rest-api.php`                            | REST endpoint registration and all download/ATP/logging handlers                                                                                             |
-| `includes/class-ability-categories.php`                  | Registers the `datasets` WP Abilities category for MCP discovery                                                                                             |
-| `includes/class-ability.php`                             | WP Abilities API `prc-datasets/get-analytics` and `prc-datasets/get-download-url` tools (MCP + REST)                                                         |
-| `includes/class-audience-service.php`                    | Shared build / list / delete for dataset downloader audiences (CLI + REST)                                                                                   |
-| `includes/class-cli.php`                                 | WP-CLI commands under `wp prc datasets`                                                                                                                      |
-| `includes/class-cli-build-audience.php`                  | `wp prc datasets build-audience` — thin CLI wrapper around Audience_Service                                                                                  |
-| `includes/class-plugin.php`                              | Bootstrap: loads classes, registers blocks, wires block bindings source, enqueues inspector panel                                                            |
-| `includes/inspector-sidebar-panel/src/index.js`          | Editor sidebar plugin — file upload (`MediaDropZone`), new-data confirm modal, ATP toggle, pre-publish panel, `prc-datasets/options-after` slot              |
-| `includes/inspector-sidebar-panel/src/stats-panel.js`    | Download heatmap with year/month selectors, day drill-down, and new-data before/after split                                                                  |
-| `includes/inspector-sidebar-panel/src/audience-panel.js` | Downloader audience Generate / Rebuild / Delete via `AudienceBuildPanel`                                                                                     |
-| `includes/render-dataset-download.php`                   | Shared ATP + Interactivity render helper used by both download blocks                                                                                        |
-| `build/download-block/`                                  | `prc-platform/dataset-download` block — interactive download button                                                                                          |
-| `build/download-button-block/`                           | `prc-platform/dataset-download-button` block — editor-picked dataset + inner `core/button`                                                                   |
-| `build/dataset-atp-legal-acceptance-block/`              | `prc-platform/dataset-atp-legal-acceptance` block — ATP opt-in form                                                                                          |
-| `build/dataset-description-block/`                       | `prc-platform/dataset-description` block — editor-only block that pulls post content via block bindings                                                      |
+| File                                                     | Purpose                                                                                                                                                                     |
+| -------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `includes/class-content-type.php`                        | CPT/taxonomy registration, the `prc/primitives` term data store relationship, meta field registration, rewrite rules, research team URL config, search/EP archive inclusion |
+| `includes/class-dataset-list.php`                        | DataViews admin list registration, row shaping, and ZIP / download-unavailable filters                                                                                      |
+| `includes/class-rest-api.php`                            | REST endpoint registration and all download/ATP/logging handlers                                                                                                            |
+| `includes/class-ability-categories.php`                  | Registers the `datasets` WP Abilities category for MCP discovery                                                                                                            |
+| `includes/class-ability.php`                             | WP Abilities API `prc-datasets/get-analytics` and `prc-datasets/get-download-url` tools (MCP + REST)                                                                        |
+| `includes/class-audience-service.php`                    | Shared build / list / delete for dataset downloader audiences (CLI + REST)                                                                                                  |
+| `includes/class-cli.php`                                 | WP-CLI commands under `wp prc datasets`                                                                                                                                     |
+| `includes/class-cli-build-audience.php`                  | `wp prc datasets build-audience` — thin CLI wrapper around Audience_Service                                                                                                 |
+| `includes/class-plugin.php`                              | Bootstrap: loads classes, registers blocks, wires block bindings source, enqueues inspector panel                                                                           |
+| `includes/inspector-sidebar-panel/src/index.js`          | Editor sidebar plugin — file upload (`MediaDropZone`), new-data confirm modal, ATP toggle, pre-publish panel, `prc-datasets/options-after` slot                             |
+| `includes/inspector-sidebar-panel/src/stats-panel.js`    | Download heatmap with year/month selectors, day drill-down, and new-data before/after split                                                                                 |
+| `includes/inspector-sidebar-panel/src/audience-panel.js` | Downloader audience Generate / Rebuild / Delete via `AudienceBuildPanel`                                                                                                    |
+| `includes/render-dataset-download.php`                   | Shared ATP + Interactivity render helper used by both download blocks                                                                                                       |
+| `build/download-block/`                                  | `prc-platform/dataset-download` block — interactive download button                                                                                                         |
+| `build/download-button-block/`                           | `prc-platform/dataset-download-button` block — editor-picked dataset + inner `core/button`                                                                                  |
+| `build/dataset-atp-legal-acceptance-block/`              | `prc-platform/dataset-atp-legal-acceptance` block — ATP opt-in form                                                                                                         |
+| `build/dataset-description-block/`                       | `prc-platform/dataset-description` block — editor-only block that pulls post content via block bindings                                                                     |
 
 ## Blocks
 
@@ -136,13 +136,13 @@ wp prc datasets missing-files [--dry-run]
 
 ## Dependencies
 
-| Dependency                                                                          | Notes                                                                                        |
-| ----------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| `prc-platform-core`                                                                 | Provides `PRC\Platform\Firebase` and lifecycle action hooks                                  |
-| `prc-user-accounts`                                                                 | `PRC\Platform\User_Accounts\User_Data` — ATP acceptance checks and per-user download logging |
-| `@prc/components`                                                                   | `MediaDropZone` and `AudienceBuildPanel` in the editor sidebar                               |
-| [`prc/term-data-store`](https://github.com/pewresearch/term-data-store) (`PRC\TDS`) | `\PRC\TDS\add_relationship()` links the `dataset` CPT and `datasets` taxonomy                |
-| ElasticPress / VIP Search                                                           | Dataset archive EP opt-in via `integrate_dataset_archive_with_elasticpress`                  |
+| Dependency                                              | Notes                                                                                        |
+| ------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `prc-platform-core`                                     | Provides `PRC\Platform\Firebase` and lifecycle action hooks                                  |
+| `prc-user-accounts`                                     | `PRC\Platform\User_Accounts\User_Data` — ATP acceptance checks and per-user download logging |
+| `@prc/components`                                       | `MediaDropZone` and `AudienceBuildPanel` in the editor sidebar                               |
+| `prc/primitives` term data store (`PRC\Primitives\TDS`) | `\PRC\Primitives\TDS\add_relationship()` links the `dataset` CPT and `datasets` taxonomy     |
+| ElasticPress / VIP Search                               | Dataset archive EP opt-in via `integrate_dataset_archive_with_elasticpress`                  |
 
 ## Notes
 

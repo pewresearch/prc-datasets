@@ -271,7 +271,7 @@ class Content_Type {
 		register_taxonomy( self::$taxonomy_object_name, $enabled_post_types, self::$taxonomy_object_args );
 
 		// Establish a relationship between the post type and taxonomy.
-		\PRC\TDS\add_relationship( self::$post_object_name, self::$taxonomy_object_name );
+		\PRC\Primitives\TDS\add_relationship( self::$post_object_name, self::$taxonomy_object_name );
 
 		// Register the post type's meta fields.
 		$this->register_dataset_fields();
@@ -449,7 +449,7 @@ class Content_Type {
 
 		$term_id = get_queried_object()->term_id;
 		// Get the associated post ID...
-		$dataset_id = \PRC\TDS\get_related_post( $term_id, self::$taxonomy_object_name );
+		$dataset_id = \PRC\Primitives\TDS\get_related_post( $term_id, self::$taxonomy_object_name );
 
 		if ( is_wp_error( $dataset_id ) ) {
 			return;

@@ -11,7 +11,7 @@ namespace PRC\Platform\Datasets;
 $dataset_id = get_the_ID();
 // But, usually, we're going to be viewing these from the perspective of the datasets taxonomy archive, so use that to get the dataset id.
 if ( is_tax( Content_Type::$taxonomy_object_name ) ) {
-	$dataset = \PRC\TDS\get_related_post( get_queried_object_id(), Content_Type::$taxonomy_object_name );
+	$dataset = \PRC\Primitives\TDS\get_related_post( get_queried_object_id(), Content_Type::$taxonomy_object_name );
 	if ( ! $dataset instanceof \WP_Post ) {
 		return;
 	}

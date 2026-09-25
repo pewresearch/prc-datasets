@@ -30,11 +30,11 @@ function resolve_dataset_post_id( int $maybe_id ): int {
 		return $maybe_id;
 	}
 
-	if ( ! function_exists( '\\PRC\\TDS\\get_related_post' ) ) {
+	if ( ! function_exists( '\\PRC\\Primitives\\TDS\\get_related_post' ) ) {
 		return 0;
 	}
 
-	$dataset = \PRC\TDS\get_related_post( $maybe_id, Content_Type::$taxonomy_object_name );
+	$dataset = \PRC\Primitives\TDS\get_related_post( $maybe_id, Content_Type::$taxonomy_object_name );
 	if ( $dataset instanceof \WP_Post && 'dataset' === $dataset->post_type ) {
 		return (int) $dataset->ID;
 	}
