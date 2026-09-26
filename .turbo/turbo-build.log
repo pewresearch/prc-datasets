@@ -1,9 +1,9 @@
 
-> @prc/datasets@1.5.1 build
+> @prc/datasets@1.5.0 build
 > npm run build:blocks && npm run build:inspector-panel && npm run build:admin-dataview
 
 
-> @prc/datasets@1.5.1 build:blocks
+> @prc/datasets@1.5.0 build:blocks
 > wp-scripts build --experimental-modules --webpack-copy-php && wp-scripts build-blocks-manifest
 
 assets by path [1m[32mdownload-button-block/[39m[22m 7.7 KiB 6 assets
@@ -35,7 +35,7 @@ built modules 17.4 KiB (javascript) 2.32 KiB (css/mini-extract) [1m[33m[built]
     css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]![1m./src/dataset-atp-legal-acceptance-block/style.scss[39m[22m 318 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
     css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]![1m./src/download-block/style.scss[39m[22m 1.06 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
     css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]![1m./src/download-button-block/style.scss[39m[22m 966 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-webpack 5.106.2 compiled [1m[32msuccessfully[39m[22m in 1549 ms
+webpack 5.106.2 compiled [1m[32msuccessfully[39m[22m in 8196 ms
 
 assets by path [1m[32mdataset-atp-legal-acceptance-block/[39m[22m 8.36 KiB
   asset [1m[32mdataset-atp-legal-acceptance-block/view.js[39m[22m 8.23 KiB [1m[32m[emitted][39m[22m [javascript module] [1m[32m[minimized][39m[22m (name: dataset-atp-legal-acceptance-block/view)
@@ -53,10 +53,10 @@ orphan modules 42 bytes [1m[33m[orphan][39m[22m 1 module
 [1m./src/dataset-atp-legal-acceptance-block/view.js + 1 modules[39m[22m 8.9 KiB [1m[31m[not cacheable][39m[22m [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
 [1m./src/download-button-block/view.js[39m[22m 100 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
 [1m./src/download-block/view.js + 1 modules[39m[22m 3.41 KiB [1m[31m[not cacheable][39m[22m [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-webpack 5.106.2 compiled [1m[32msuccessfully[39m[22m in 836 ms
+webpack 5.106.2 compiled [1m[32msuccessfully[39m[22m in 4142 ms
 Block metadata PHP file generated at: build/blocks-manifest.php
 
-> @prc/datasets@1.5.1 build:inspector-panel
+> @prc/datasets@1.5.0 build:inspector-panel
 > wp-scripts build --source-path=includes/inspector-sidebar-panel/src --output-path=includes/inspector-sidebar-panel/build
 
 assets by path [1m[32m*.css[39m[22m 152 bytes
@@ -70,9 +70,9 @@ runtime modules 663 bytes 3 modules
 built modules 19.2 KiB (javascript) 75 bytes (css/mini-extract) [1m[33m[built][39m[22m
   [1m./includes/inspector-sidebar-panel/src/index.js + 18 modules[39m[22m 19.2 KiB [1m[31m[not cacheable][39m[22m [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
   css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]![1m./includes/inspector-sidebar-panel/src/stats-panel.scss[39m[22m 75 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-webpack 5.106.2 compiled [1m[32msuccessfully[39m[22m in 1394 ms
+webpack 5.106.2 compiled [1m[32msuccessfully[39m[22m in 5954 ms
 
-> @prc/datasets@1.5.1 build:admin-dataview
+> @prc/datasets@1.5.0 build:admin-dataview
 > wp-scripts build --config webpack.admin-dataview.config.js
 
 assets by chunk 152 KiB (name: index)
@@ -116,4 +116,4 @@ Entrypoints:
 You can limit the size of your bundles by using import() or require.ensure to lazy load some parts of your application.
 For more info visit https://webpack.js.org/guides/code-splitting/[39m[22m
 
-webpack 5.106.2 compiled with [1m[33m2 warnings[39m[22m in 12643 ms
+webpack 5.106.2 compiled with [1m[33m2 warnings[39m[22m in 43290 ms
