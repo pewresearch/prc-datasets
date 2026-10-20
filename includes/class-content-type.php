@@ -236,6 +236,7 @@ class Content_Type {
 		add_post_type_support( 'chart', 'prc-datasets' );
 		// Add sitemap support for the dataset post type itself.
 		add_post_type_support( self::$post_object_name, 'prc-sitemap' );
+		add_post_type_support( self::$post_object_name, 'prc-post-visibility' );
 	}
 
 	/**
@@ -382,8 +383,8 @@ class Content_Type {
 		$rules = array(
 			'datasets/(\d\d\d\d)/page/?([0-9]{1,})/?$' => 'index.php?post_type=dataset&year=$matches[1]&paged=$matches[2]',
 			'datasets/(\d\d\d\d)/?$'                   => 'index.php?post_type=dataset&year=$matches[1]',
-			'datasets/page/?([0-9]{1,})/?$'             => 'index.php?post_type=dataset&paged=$matches[1]',
-			'datasets/?$'                               => 'index.php?post_type=dataset',
+			'datasets/page/?([0-9]{1,})/?$'            => 'index.php?post_type=dataset&paged=$matches[1]',
+			'datasets/?$'                              => 'index.php?post_type=dataset',
 		);
 		foreach ( $rules as $rule => $query ) {
 			add_rewrite_rule( $rule, $query, 'top' );
@@ -526,5 +527,4 @@ class Content_Type {
 		}
 		return $query_args;
 	}
-
 }

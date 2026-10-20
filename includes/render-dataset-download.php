@@ -85,9 +85,9 @@ function render_dataset_download_ui( int $dataset_id, string $content ): string 
 				)
 			),
 			'data-wp-bind--data-dataset-id' => 'context.datasetId',
-			'data-wp-watch--is-processing'  => 'callbacks.isProcessing',
-			'data-wp-watch--is-error'       => 'callbacks.isError',
-			'data-wp-watch--is-success'     => 'callbacks.isSuccess',
+			'data-wp-watch---is-processing' => 'callbacks.isProcessing',
+			'data-wp-watch---is-error'      => 'callbacks.isError',
+			'data-wp-watch---is-success'    => 'callbacks.isSuccess',
 		)
 	);
 
