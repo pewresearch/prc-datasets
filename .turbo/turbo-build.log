@@ -38,7 +38,7 @@ built modules 17.4 KiB (javascript) 2.32 KiB (css/mini-extract) [1m[33m[built]
     css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]![1m./src/dataset-atp-legal-acceptance-block/style.scss[39m[22m 318 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
     css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]![1m./src/download-block/style.scss[39m[22m 1.06 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
     css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]![1m./src/download-button-block/style.scss[39m[22m 966 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-webpack 5.106.2 compiled [1m[32msuccessfully[39m[22m in 9284 ms
+webpack 5.106.2 compiled [1m[32msuccessfully[39m[22m in 7356 ms
 
 assets by path [1m[32mdataset-atp-legal-acceptance-block/[39m[22m 8.36 KiB
   asset [1m[32mdataset-atp-legal-acceptance-block/view.js[39m[22m 8.23 KiB [1m[32m[emitted][39m[22m [javascript module] [1m[32m[minimized][39m[22m (name: dataset-atp-legal-acceptance-block/view)
@@ -56,7 +56,7 @@ orphan modules 42 bytes [1m[33m[orphan][39m[22m 1 module
 [1m./src/dataset-atp-legal-acceptance-block/view.js + 1 modules[39m[22m 8.9 KiB [1m[31m[not cacheable][39m[22m [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
 [1m./src/download-button-block/view.js[39m[22m 100 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
 [1m./src/download-block/view.js + 1 modules[39m[22m 3.41 KiB [1m[31m[not cacheable][39m[22m [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-webpack 5.106.2 compiled [1m[32msuccessfully[39m[22m in 4983 ms
+webpack 5.106.2 compiled [1m[32msuccessfully[39m[22m in 3887 ms
 Block metadata PHP file generated at: build/blocks-manifest.php
 
 > @prc/datasets@1.5.1 build:inspector-panel
@@ -76,7 +76,7 @@ runtime modules 663 bytes 3 modules
 built modules 19.2 KiB (javascript) 75 bytes (css/mini-extract) [1m[33m[built][39m[22m
   [1m./includes/inspector-sidebar-panel/src/index.js + 18 modules[39m[22m 19.2 KiB [1m[31m[not cacheable][39m[22m [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
   css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]![1m./includes/inspector-sidebar-panel/src/stats-panel.scss[39m[22m 75 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-webpack 5.106.2 compiled [1m[32msuccessfully[39m[22m in 7896 ms
+webpack 5.106.2 compiled [1m[32msuccessfully[39m[22m in 6069 ms
 
 > @prc/datasets@1.5.1 build:admin-dataview
 > wp-scripts build --config webpack.admin-dataview.config.js
@@ -97,13 +97,13 @@ Entrypoint [1mindex[39m[22m [1m[33m[big][39m[22m 521 KiB = 6 assets
 orphan modules 7.88 MiB (javascript) 6.41 KiB (runtime) [1m[33m[orphan][39m[22m 4085 modules
 runtime modules 3.33 KiB 6 modules
 built modules 675 KiB (javascript) 185 KiB (css/mini-extract) [1m[33m[built][39m[22m
-  modules by path [1m../[39m[22m 88.7 KiB (javascript) 185 KiB (css/mini-extract)
-    javascript modules 88.7 KiB
+  modules by path [1m../[39m[22m 88.8 KiB (javascript) 185 KiB (css/mini-extract)
+    javascript modules 88.8 KiB
       modules by path [1m../../node_modules/prop-types/[39m[22m 2.6 KiB 3 modules
       + 4 modules
     css modules 185 KiB
-      css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]![1m../prc-scripts/includes/scripts/src/@prc/components/audience-build-pa...(truncated)[39m[22m 89.6 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
-      css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]![1m../prc-scripts/includes/scripts/src/@prc/components/icon-picker/styles.scss[39m[22m 647 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+      css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]![1m../prc-shared/includes/scripts/src/@prc/components/audience-build-pa...(truncated)[39m[22m 89.6 KiB [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
+      css ../../node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!../../node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!../../node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]![1m../prc-shared/includes/scripts/src/@prc/components/icon-picker/styles.scss[39m[22m 647 bytes [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
       + 3 modules
   modules by path [1m./[39m[22m 586 KiB (javascript) 294 bytes (css/mini-extract)
     [1m./src/admin-dataview/index.jsx + 337 modules[39m[22m 586 KiB [1m[31m[not cacheable][39m[22m [1m[33m[built][39m[22m [1m[33m[code generated][39m[22m
@@ -125,4 +125,4 @@ Entrypoints:
 You can limit the size of your bundles by using import() or require.ensure to lazy load some parts of your application.
 For more info visit https://webpack.js.org/guides/code-splitting/[39m[22m
 
-webpack 5.106.2 compiled with [1m[33m2 warnings[39m[22m in 47188 ms
+webpack 5.106.2 compiled with [1m[33m2 warnings[39m[22m in 46759 ms

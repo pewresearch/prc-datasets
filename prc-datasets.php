@@ -30,7 +30,7 @@ namespace PRC\Platform\Datasets;
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       prc-datasets
  * Domain Path:       /languages
- * Requires Plugins:  prc-scripts, prc-post-publish-pipeline
+ * Requires Plugins:  prc-shared
  */
 
 // If this file is called directly, abort.
