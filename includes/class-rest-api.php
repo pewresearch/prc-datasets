@@ -409,35 +409,14 @@ class Rest_API {
 			return $throttled;
 		}
 
-		$auth = \PRC\Platform\User_Accounts\extract_user_auth_from_request( $request );
-		if ( is_wp_error( $auth ) ) {
-			return $auth;
+		$authorized = $this->authorize_download( $request );
+		if ( is_wp_error( $authorized ) ) {
+			return $authorized;
 		}
-		$uid   = $auth['uid'];
-		$token = $auth['token'];
-
-		$id = $request->get_param( 'dataset_id' );
-		if ( ! $id ) {
-			return new WP_Error( 'no_id', 'No dataset ID provided.', array( 'status' => 400 ) );
-		}
-
-		$id = (int) $id;
-		if ( get_post_type( $id ) !== Content_Type::$post_object_name ) {
-			return new WP_Error(
-				'invalid_dataset',
-				'Post not found or is not a dataset.',
-				array( 'status' => 404 )
-			);
-		}
-
-		if ( ! class_exists( '\\PRC\\Platform\\User_Accounts\\User_Data' ) ) {
-			return new WP_Error( 'no_user_accounts', 'User Accounts class not found.', array( 'status' => 400 ) );
-		}
-
-		$user = new \PRC\Platform\User_Accounts\User_Data( $uid, $token );
-		if ( is_wp_error( $user->data ) ) {
-			return $user->data;
-		}
+		$id    = $authorized['dataset_id'];
+		$uid   = $authorized['uid'];
+		$token = $authorized['token'];
+		$user  = $authorized['user'];
 
 		$resolved = self::resolve_download_file_url( $id, true );
 		if ( is_wp_error( $resolved ) ) {
@@ -545,22 +524,70 @@ class Rest_API {
 	 * @return array|WP_Error
 	 */
 	public function restfully_log_download( WP_REST_Request $request ) {
+		$authorized = $this->authorize_download( $request );
+		if ( is_wp_error( $authorized ) ) {
+			return $authorized;
+		}
+		$id = $authorized['dataset_id'];
+
+		$return            = array();
+		$return['total']   = $this->increment_download_total( $id );
+		$return['monthly'] = $this->log_monthly_download_count( $id );
+		$return['uid']     = $this->log_dataset_to_user( $authorized['uid'], $id, $authorized['token'] );
+
+		return $return;
+	}
+
+	/**
+	 * Gate shared by get-download and log-download.
+	 *
+	 * Runs before any file URL is resolved or any counter is written. An
+	 * unpublished dataset answers 404 like a missing one, so embargoed
+	 * dataset IDs cannot be probed.
+	 *
+	 * @param WP_REST_Request $request The request.
+	 * @return array{dataset_id: int, uid: string, token: string, user: \PRC\Platform\User_Accounts\User_Data}|WP_Error
+	 */
+	private function authorize_download( WP_REST_Request $request ) {
 		$auth = \PRC\Platform\User_Accounts\extract_user_auth_from_request( $request );
 		if ( is_wp_error( $auth ) ) {
 			return $auth;
 		}
 
-		$id = $request->get_param( 'dataset_id' );
+		$id = absint( $request->get_param( 'dataset_id' ) );
 		if ( ! $id ) {
-			return new WP_Error( 'no_dataset_id', 'No dataset ID provided.', array( 'status' => 400 ) );
+			return new WP_Error( 'no_id', 'No dataset ID provided.', array( 'status' => 400 ) );
 		}
 
-		$return            = array();
-		$return['total']   = $this->increment_download_total( $id );
-		$return['monthly'] = $this->log_monthly_download_count( $id );
-		$return['uid']     = $this->log_dataset_to_user( $auth['uid'], $id, $auth['token'] );
+		$readable = is_post_publicly_viewable( $id ) || current_user_can( 'edit_post', $id );
+		if ( get_post_type( $id ) !== Content_Type::$post_object_name || ! $readable ) {
+			return new WP_Error(
+				'invalid_dataset',
+				'Post not found or is not a dataset.',
+				array( 'status' => 404 )
+			);
+		}
 
-		return $return;
+		if ( ! class_exists( '\\PRC\\Platform\\User_Accounts\\User_Data' ) ) {
+			return new WP_Error( 'no_user_accounts', 'User Accounts class not found.', array( 'status' => 400 ) );
+		}
+
+		$user = new \PRC\Platform\User_Accounts\User_Data( $auth['uid'], $auth['token'] );
+		if ( is_wp_error( $user->data ) ) {
+			return $user->data;
+		}
+
+		$atp = $this->maybe_require_atp( true, 0, array( 'dataset_id' => $id ), $user );
+		if ( is_wp_error( $atp ) ) {
+			return $atp;
+		}
+
+		return array(
+			'dataset_id' => $id,
+			'uid'        => $auth['uid'],
+			'token'      => $auth['token'],
+			'user'       => $user,
+		);
 	}
 
 	/**
