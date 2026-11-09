@@ -14,10 +14,10 @@ namespace PRC\Platform\Datasets;
 
 use PRC\Platform\CLI_Audience_Verification;
 use WP_CLI;
-use WP_CLI_Command;
 use WP_CLI\Utils;
+use WPCOM_VIP_CLI_Command;
 
-if ( ! defined( 'WP_CLI' ) || ! WP_CLI ) {
+if ( ! defined( 'WP_CLI' ) || ! WP_CLI || ! class_exists( 'WPCOM_VIP_CLI_Command' ) ) {
 	return;
 }
 
@@ -26,7 +26,7 @@ require_once dirname( __DIR__, 2 ) . '/prc-firebase/includes/trait-cli-audience-
 /**
  * Builds a newsletter recipient audience from Firebase dataset downloaders.
  */
-class CLI_Build_Audience extends WP_CLI_Command {
+class CLI_Build_Audience extends WPCOM_VIP_CLI_Command {
 
 	use CLI_Audience_Verification;
 

@@ -189,6 +189,7 @@ class Content_Type {
 		$this->loader->add_action( 'init', $this, 'register_term_data_store' );
 		$this->loader->add_action( 'init', $this, 'archive_rewrites' );
 		$this->loader->add_filter( 'post_type_archive_link', $this, 'filter_post_type_archive_link', 10, 2 );
+		$this->loader->add_filter( 'prc_platform_breadcrumbs', $this, 'filter_breadcrumbs' );
 		$this->loader->add_filter( 'prc_research_teams_rewrite_config', $this, 'register_research_teams_config' );
 		$this->loader->add_action( 'admin_bar_menu', $this, 'modify_admin_bar_edit_link', 100 );
 		$this->loader->add_filter( 'prc_platform_post_report_package_materials', $this, 'get_datasets_for_report_materials', 10, 2 );
@@ -410,6 +411,44 @@ class Content_Type {
 			return $link;
 		}
 		return home_url( '/datasets/' );
+	}
+
+	/**
+	 * Point the Research Topics index crumb at the Datasets archive on a dataset page.
+	 *
+	 * Public dataset pages are `datasets` term views (`/dataset/<slug>/`); the
+	 * `dataset` single covers previews.
+	 *
+	 * @hook prc_platform_breadcrumbs
+	 *
+	 * @param array $crumbs Breadcrumb records.
+	 * @return array
+	 */
+	public function filter_breadcrumbs( $crumbs ) {
+		if ( ! is_array( $crumbs ) ) {
+			return $crumbs;
+		}
+		if ( ! is_tax( self::$taxonomy_object_name ) && ! is_singular( self::$post_object_name ) ) {
+			return $crumbs;
+		}
+
+		$topics_url = untrailingslashit( home_url( '/topics' ) );
+
+		return array_map(
+			static function ( $crumb ) use ( $topics_url ) {
+				if ( ! is_array( $crumb ) || ! isset( $crumb['url'] ) || ! is_string( $crumb['url'] ) ) {
+					return $crumb;
+				}
+				if ( untrailingslashit( $crumb['url'] ) !== $topics_url ) {
+					return $crumb;
+				}
+				return array(
+					'url'  => get_post_type_archive_link( self::$post_object_name ),
+					'text' => __( 'Datasets', 'prc-datasets' ),
+				);
+			},
+			$crumbs
+		);
 	}
 
 	/**
