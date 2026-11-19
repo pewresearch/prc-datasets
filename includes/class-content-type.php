@@ -238,6 +238,7 @@ class Content_Type {
 		// Add sitemap support for the dataset post type itself.
 		add_post_type_support( self::$post_object_name, 'prc-sitemap' );
 		add_post_type_support( self::$post_object_name, 'prc-post-visibility' );
+		add_post_type_support( self::$post_object_name, 'prc-collections' );
 	}
 
 	/**
